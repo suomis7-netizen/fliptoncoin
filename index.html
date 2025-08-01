@@ -50,31 +50,43 @@
 <body>
   <h1>FlipTONcoin</h1>
 
+  <!-- TonConnect prisijungimo mygtukas -->
   <div id="ton-connect"></div>
+
+  <!-- Moneta -->
   <div class="coin" id="coin">?</div>
+
+  <!-- Spėjimo mygtukai -->
   <div>
     <button class="game-button" onclick="flip('heads')">Heads - Bet 0.1 TON</button>
     <button class="game-button" onclick="flip('tails')">Tails - Bet 0.1 TON</button>
   </div>
+
   <p id="result"></p>
 
   <script>
+    // Inicializuojame TonConnect UI
     const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
       manifestUrl: "https://suomis7-netizen.github.io/fliptoncoin/tonconnect-manifest.json",
       buttonRootId: "ton-connect"
     });
 
+    // Monetos metimo funkcija su transakcija
     async function flip(userChoice) {
       try {
+        // Sukuriame 0.1 TON transakciją į tavo piniginę
         const tx = {
           validUntil: Math.floor(Date.now() / 1000) + 360,
           messages: [{
-            address: "UQAmyVyYj0GqYxYhINVXgzERiEe8Sa8c03mbV2Q8yYAMKvxg",
-            amount: (0.1 * 1e9).toString()
-          }],
+            address: "UQAmyVyYj0GqYxYhINVXgzERiEe8Sa8c03mbV2Q8yYAMKvxg",  // tavo adresas
+            amount: (0.1 * 1e9).toString()  // 0.1 TON nanotons formatu
+          }]
         };
+
+        // Siunčiame transakciją
         await tonConnectUI.sendTransaction(tx);
 
+        // Paleidžiam monetos metimą (tik vizualiai)
         const coin = document.getElementById('coin');
         const result = document.getElementById('result');
         coin.style.animation = 'flip 1s linear';
@@ -85,11 +97,12 @@
           coin.textContent = outcome === 'heads' ? 'H' : 'T';
           result.textContent =
             userChoice === outcome
-              ? '🎉 You won (virtually)!'
+              ? '🎉 You won (virtual)!'
               : '😢 You lost.';
         }, 1000);
       } catch (e) {
-        alert("Transaction cancelled or failed.");
+        alert("❌ Transaction cancelled or failed.");
+        console.error(e);
       }
     }
   </script>
