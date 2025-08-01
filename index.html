@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="="en">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>FlipTONcoin</title>
-  <script src="https://unpkg.com/@tonconnect/sdk@latest/dist/tonconnect-sdk.min.js"></script>
+  <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
   <style>
     body {
       font-family: sans-serif;
@@ -32,7 +32,7 @@
       0%   { transform: rotateY(0deg); }
       100% { transform: rotateY(360deg); }
     }
-    button {
+    button.game-button {
       margin: 1rem;
       padding: 1rem 2rem;
       font-size: 1.2rem;
@@ -43,7 +43,7 @@
       border-radius: 8px;
       transition: background 0.3s;
     }
-    button:hover {
+    button.game-button:hover {
       background: #0056b3;
     }
     #wallet-address {
@@ -55,31 +55,21 @@
 </head>
 <body>
   <h1>FlipTONcoin</h1>
-  <button id="connect-btn">🔗 Connect Wallet</button>
+
+  <div id="ton-connect"></div>
   <div id="wallet-address"></div>
 
   <div class="coin" id="coin">?</div>
   <div>
-    <button onclick="flip('heads')">Heads - Bet 0.1 TON</button>
-    <button onclick="flip('tails')">Tails - Bet 0.1 TON</button>
+    <button class="game-button" onclick="flip('heads')">Heads - Bet 0.1 TON</button>
+    <button class="game-button" onclick="flip('tails')">Tails - Bet 0.1 TON</button>
   </div>
   <p id="result"></p>
 
   <script>
-    window.addEventListener('DOMContentLoaded', () => {
-      const tonConnect = new TonConnectSDK.TonConnect({
-  manifestUrl: "https://suomis7-netizen.github.io/fliptoncoin/tonconnect-manifest.json"
-});
-
-      tonConnect.onStatusChange(wallet => {
-        if (wallet && wallet.account) {
-          document.getElementById('wallet-address').innerText = `Connected: ${wallet.account.address}`;
-        }
-      });
-
-      document.getElementById('connect-btn').addEventListener('click', () => {
-        tonConnect.connect();
-      });
+    const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
+      manifestUrl: "https://suomis7-netizen.github.io/fliptoncoin/tonconnect-manifest.json",
+      buttonRootId: "ton-connect"
     });
 
     function flip(userChoice) {
