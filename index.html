@@ -14,7 +14,6 @@
     }
     h1 {
       font-size: 2.2rem;
-      margin-bottom: 1rem;
     }
     .coin {
       margin: 2rem auto;
@@ -46,19 +45,12 @@
     button.game-button:hover {
       background: #0056b3;
     }
-    #wallet-address {
-      margin-top: 1rem;
-      font-size: 1rem;
-      color: #333;
-    }
   </style>
 </head>
 <body>
   <h1>FlipTONcoin</h1>
 
   <div id="ton-connect"></div>
-  <div id="wallet-address"></div>
-
   <div class="coin" id="coin">?</div>
   <div>
     <button class="game-button" onclick="flip('heads')">Heads - Bet 0.1 TON</button>
@@ -72,20 +64,33 @@
       buttonRootId: "ton-connect"
     });
 
-    function flip(userChoice) {
-      const coin = document.getElementById('coin');
-      const result = document.getElementById('result');
-      coin.style.animation = 'flip 1s linear';
+    async function flip(userChoice) {
+      try {
+        const tx = {
+          validUntil: Math.floor(Date.now() / 1000) + 360,
+          messages: [{
+            address: "UQAmyVyYj0GqYxYhINVXgzERiEe8Sa8c03mbV2Q8yYAMKvxg",
+            amount: (0.1 * 1e9).toString()
+          }],
+        };
+        await tonConnectUI.sendTransaction(tx);
 
-      setTimeout(() => {
-        coin.style.animation = 'none';
-        const outcome = Math.random() < 0.5 ? 'heads' : 'tails';
-        coin.textContent = outcome === 'heads' ? 'H' : 'T';
-        result.textContent =
-          userChoice === outcome
-            ? '🎉 You won 0.19 TON!'
-            : '😢 You lost 0.1 TON.';
-      }, 1000);
+        const coin = document.getElementById('coin');
+        const result = document.getElementById('result');
+        coin.style.animation = 'flip 1s linear';
+
+        setTimeout(() => {
+          coin.style.animation = 'none';
+          const outcome = Math.random() < 0.5 ? 'heads' : 'tails';
+          coin.textContent = outcome === 'heads' ? 'H' : 'T';
+          result.textContent =
+            userChoice === outcome
+              ? '🎉 You won (virtually)!'
+              : '😢 You lost.';
+        }, 1000);
+      } catch (e) {
+        alert("Transaction cancelled or failed.");
+      }
     }
   </script>
 </body>
