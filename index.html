@@ -45,6 +45,11 @@
     button.game-button:hover {
       background: #0056b3;
     }
+    select {
+      font-size: 1.2rem;
+      padding: 0.5rem;
+      margin-bottom: 1rem;
+    }
   </style>
 </head>
 <body>
@@ -53,13 +58,28 @@
   <!-- TonConnect prisijungimo mygtukas -->
   <div id="ton-connect"></div>
 
+  <!-- Pasirink statymo sumą -->
+  <div>
+    <label for="betAmount">Choose bet amount:</label><br>
+    <select id="betAmount">
+      <option value="0.1">0.1 TON</option>
+      <option value="1">1 TON</option>
+      <option value="2">2 TON</option>
+      <option value="5">5 TON</option>
+      <option value="10">10 TON</option>
+      <option value="20">20 TON</option>
+      <option value="50">50 TON</option>
+      <option value="100">100 TON</option>
+    </select>
+  </div>
+
   <!-- Moneta -->
   <div class="coin" id="coin">?</div>
 
   <!-- Spėjimo mygtukai -->
   <div>
-    <button class="game-button" onclick="flip('heads')">Heads - Bet 0.1 TON</button>
-    <button class="game-button" onclick="flip('tails')">Tails - Bet 0.1 TON</button>
+    <button class="game-button" onclick="flip('heads')">Heads</button>
+    <button class="game-button" onclick="flip('tails')">Tails</button>
   </div>
 
   <p id="result"></p>
@@ -74,19 +94,21 @@
     // Monetos metimo funkcija su transakcija
     async function flip(userChoice) {
       try {
-        // Sukuriame 0.1 TON transakciją į tavo piniginę
+        const amountTON = parseFloat(document.getElementById("betAmount").value);
+        const amountNanoTON = (amountTON * 1e9).toFixed(0);
+
         const tx = {
           validUntil: Math.floor(Date.now() / 1000) + 360,
           messages: [{
-            address: "UQAmyVyYj0GqYxYhINVXgzERiEe8Sa8c03mbV2Q8yYAMKvxg",  // tavo adresas
-            amount: (0.1 * 1e9).toString()  // 0.1 TON nanotons formatu
+            address: "EQDX9mDOtrux4xqlzWIl5OjPECsv1OEHwCLp1Tm5okfb1qKQ",  // tavo kontrakto adresas
+            amount: amountNanoTON,
+            payload: ""  // kol kas be papildomo duomens
           }]
         };
 
-        // Siunčiame transakciją
         await tonConnectUI.sendTransaction(tx);
 
-        // Paleidžiam monetos metimą (tik vizualiai)
+        // Animacija
         const coin = document.getElementById('coin');
         const result = document.getElementById('result');
         coin.style.animation = 'flip 1s linear';
@@ -97,9 +119,10 @@
           coin.textContent = outcome === 'heads' ? 'H' : 'T';
           result.textContent =
             userChoice === outcome
-              ? '🎉 You won (virtual)!'
-              : '😢 You lost.';
+              ? `🎉 You guessed ${userChoice.toUpperCase()} and WON (visual only)`
+              : `😢 You guessed ${userChoice.toUpperCase()} and lost`;
         }, 1000);
+
       } catch (e) {
         alert("❌ Transaction cancelled or failed.");
         console.error(e);
