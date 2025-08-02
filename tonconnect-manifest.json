@@ -1,7 +1,16 @@
 {
-  "url": "https://suomis7-netizen.github.io/fliptoncoin/",
+  "manifest_version": 1,
   "name": "FlipTONcoin",
-  "iconUrl": "https://suomis7-netizen.github.io/fliptoncoin/icon.png",
-  "termsOfUseUrl": "https://suomis7-netizen.github.io/fliptoncoin/terms",
-  "privacyPolicyUrl": "https://suomis7-netizen.github.io/fliptoncoin/privacy"
+  "description": "Coin flip game with TON",
+  "url": "https://suomis7-netizen.github.io/fliptoncoin/",
+  "icons": [
+    {
+      "src": "https://suomis7-netizen.github.io/fliptoncoin/icon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ],
+  "bridge": {
+    "type": "ton-x"
+  }
 }
