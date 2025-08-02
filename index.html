@@ -33,23 +33,59 @@
       background-color: #e8f5e8;
       border-radius: 5px;
     }
+    .wallet-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 20px auto;
+      max-width: 600px;
+    }
+    .wallet-section {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 5px;
+    }
+    .wallet-section input {
+      width: 60px;
+      padding: 5px;
+      font-size: 14px;
+    }
+    .wallet-section button {
+      padding: 8px 12px;
+      font-size: 14px;
+      border-radius: 5px;
+    }
+    .wallet-section button.deposit {
+      background-color: #4CAF50;
+      color: white;
+    }
+    .wallet-section button.withdraw {
+      background-color: #ff9800;
+      color: white;
+    }
+    #ton-connect {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 10px auto;
+    }
     #coin {
-      width: 120px;
-      height: 120px;
-      background: linear-gradient(135deg, #0088cc 0%, #0066aa 50%, #004488 100%);
+      width: 220px;
+      height: 220px;
+      background: radial-gradient(circle at 30% 30%, #00ffff, #0099cc 50%, #002244);
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 28px;
+      font-size: 60px;
       font-weight: bold;
-      margin: 20px auto;
-      border: 4px solid #ffffff;
-      box-shadow: 0 6px 20px rgba(0, 136, 204, 0.4), inset 0 2px 4px rgba(255, 255, 255, 0.3);
+      margin: 0 auto 10px auto;
+      border: 10px solid #ffffff;
+      box-shadow: 0 12px 40px rgba(0, 136, 204, 0.8), inset 0 5px 10px rgba(255, 255, 255, 0.7);
       color: white;
       position: relative;
       overflow: hidden;
-      animation-duration: 1s;
     }
     #coin::before {
       content: '';
@@ -59,7 +95,7 @@
       right: 10%;
       bottom: 10%;
       border-radius: 50%;
-      border: 2px solid rgba(255, 255, 255, 0.2);
+      border: 2px solid rgba(255, 255, 255, 0.3);
     }
     #coin::after {
       content: '';
@@ -69,7 +105,7 @@
       right: 20%;
       bottom: 20%;
       border-radius: 50%;
-      background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.3), transparent 50%);
+      background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.5), transparent 50%);
     }
     .coin-text {
       position: relative;
@@ -88,22 +124,10 @@
     }
     input, button {
       margin: 5px;
-      padding: 10px;
       font-size: 16px;
     }
     button {
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      border-radius: 5px;
       cursor: pointer;
-    }
-    button:hover {
-      background-color: #45a049;
-    }
-    button:disabled {
-      background-color: #cccccc;
-      cursor: not-allowed;
     }
     #result {
       font-size: 24px;
@@ -120,12 +144,6 @@
       color: green;
       margin: 10px 0;
       display: none;
-    }
-    #ton-connect {
-      margin: 20px auto;
-      display: flex;
-      justify-content: center;
-      align-items: center;
     }
     .bet-amounts {
       display: grid;
@@ -160,218 +178,69 @@
       .bet-amounts {
         grid-template-columns: repeat(3, 1fr);
       }
-      .bet-btn.full-width-mobile {
-        grid-column: span 3;
+      .wallet-actions {
+        flex-direction: column;
+      }
+      .wallet-section {
+        justify-content: center;
       }
     }
-    .deposit-controls {
-      margin: 20px 0;
-      padding: 15px;
-      background-color: #f9f9f9;
-      border-radius: 8px;
-    }
-    .bet-controls {
-      margin: 20px 0;
-      padding: 15px;
-      background-color: #f0f8ff;
-      border-radius: 8px;
-    }
-    .withdraw-btn {
-      background-color: #ff9800;
-      margin-left: 10px;
-    }
-    .withdraw-btn:hover {
-      background-color: #e68900;
-    }
-    .section-title {
-      font-weight: bold;
-      margin-bottom: 10px;
-      color: #333;
-    }
-</style>
+  </style>
 </head>
 <body>
   <div class="container">
     <h1>TON Coin Flip Game</h1>
     <div id="balance">Your in-game balance: 0.00 TON</div>
-    <div id="ton-connect"></div>
-    <div class="error" id="error-message"></div>
-    <div class="success" id="success-message"></div>
+
+    <div class="wallet-actions">
+      <div class="wallet-section">
+        <input type="number" placeholder="10">
+        <button class="deposit" onclick="alert('Deposit')">Deposit</button>
+      </div>
+      <div id="ton-connect"></div>
+      <div class="wallet-section">
+        <input type="number" placeholder="10">
+        <button class="withdraw" onclick="alert('Withdraw')">Withdraw</button>
+      </div>
+    </div>
 
     <div id="coin">
       <span class="coin-text">💎</span>
     </div>
+
     <div class="controls">
-      <button onclick="flip('heads')" id="headsBtn">Heads</button>
-      <button onclick="flip('tails')" id="tailsBtn">Tails</button>
+      <button onclick="alert('Heads')" id="headsBtn">Heads</button>
+      <button onclick="alert('Tails')" id="tailsBtn">Tails</button>
     </div>
 
     <div class="bet-controls">
       <div class="section-title">🎯 Select Bet Amount</div>
       <div class="bet-amounts">
-        <button class="bet-btn selected" onclick="selectBetAmount(0.5)">0.5</button>
-        <button class="bet-btn" onclick="selectBetAmount(1)">1</button>
-        <button class="bet-btn" onclick="selectBetAmount(2)">2</button>
-        <button class="bet-btn" onclick="selectBetAmount(5)">5</button>
-        <button class="bet-btn" onclick="selectBetAmount(10)">10</button>
-        <button class="bet-btn" onclick="selectBetAmount(20)">20</button>
-        <button class="bet-btn" onclick="selectBetAmount(50)">50</button>
-        <button class="bet-btn" onclick="selectBetAmount(100)">100</button>
-        <button class="bet-btn" onclick="selectBetAmount(500)">500</button>
-        <button class="bet-btn full-width-mobile" onclick="selectBetAmount(1000)">1000</button>
+        <button class="bet-btn selected" onclick="alert('0.5')">0.5</button>
+        <button class="bet-btn" onclick="alert('1')">1</button>
+        <button class="bet-btn" onclick="alert('2')">2</button>
+        <button class="bet-btn" onclick="alert('5')">5</button>
+        <button class="bet-btn" onclick="alert('10')">10</button>
+        <button class="bet-btn" onclick="alert('20')">20</button>
+        <button class="bet-btn" onclick="alert('50')">50</button>
+        <button class="bet-btn" onclick="alert('100')">100</button>
+        <button class="bet-btn" onclick="alert('500')">500</button>
+        <button class="bet-btn full-width-mobile" onclick="alert('1000')">1000</button>
       </div>
       <div>Selected bet: <span id="selectedBet">0.5</span> TON</div>
     </div>
 
     <div id="result"></div>
-
-    <div class="deposit-controls">
-      <div class="section-title">💰 Deposit TON</div>
-      <input type="number" id="depositAmount" min="1" max="1000" step="0.1" value="10" placeholder="Deposit amount (1-1000 TON)">
-      <button onclick="deposit()">Deposit TON</button>
-      <button class="withdraw-btn" onclick="withdraw()">Withdraw</button>
-    </div>
   </div>
 
-  <!-- Sound effects -->
-  <audio id="winSound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_6478241a99.mp3?filename=success-1-6297.mp3"></audio>
-  <audio id="loseSound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_d9ce97c839.mp3?filename=fail-1-89169.mp3"></audio>
-
   <script>
-    let tonConnectUI;
-
-    async function initTonConnect() {
-      if (typeof TON_CONNECT_UI === 'undefined') return;
-      tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
+    // Re-initialize Connect Wallet button
+    document.addEventListener("DOMContentLoaded", function () {
+      const tonConnect = new TON_CONNECT_UI.TonConnectUI({
         manifestUrl: "https://suomis7-netizen.github.io/fliptoncoin/tonconnect-manifest.json",
         buttonRootId: "ton-connect"
       });
-    }
-
-    window.onload = async () => {
-      await initTonConnect();
-      loadBalance();
-      updateBalanceDisplay();
-    };
-  // === Full game logic restored ===
-const gameState = {
-  balance: 0,
-  selectedBetAmount: 0.5,
-  storageKey: 'tonCoinFlipBalance',
-  tonConnectUI: null
-};
-
-const winSound = document.getElementById("winSound");
-const loseSound = document.getElementById("loseSound");
-
-function saveBalance() {
-  localStorage.setItem(gameState.storageKey, gameState.balance.toString());
-}
-
-function loadBalance() {
-  const saved = localStorage.getItem(gameState.storageKey);
-  if (saved && !isNaN(saved)) {
-    gameState.balance = parseFloat(saved);
-  }
-}
-
-function updateBalanceDisplay() {
-  document.getElementById("balance").textContent =
-    "Your in-game balance: " + gameState.balance.toFixed(2) + " TON";
-  saveBalance();
-}
-
-function selectBetAmount(amount) {
-  gameState.selectedBetAmount = amount;
-  document.querySelectorAll(".bet-btn").forEach((btn) => btn.classList.remove("selected"));
-  event.target.classList.add("selected");
-  document.getElementById("selectedBet").textContent = amount;
-}
-
-function flip(userChoice) {
-  const amount = gameState.selectedBetAmount;
-  if (gameState.balance < amount) {
-    alert("Your balance is too low. Please deposit TON before playing.");
-    return;
-  }
-
-  const coin = document.getElementById("coin");
-  const coinText = coin.querySelector(".coin-text");
-  const resultEl = document.getElementById("result");
-
-  coin.style.animation = "flip 1s linear";
-  coinText.textContent = "?";
-  resultEl.textContent = "";
-
-  setTimeout(() => {
-    coin.style.animation = "none";
-    const outcome = Math.random() < 0.5 ? "heads" : "tails";
-    coinText.textContent = outcome === "heads" ? "💎" : "T";
-
-    if (userChoice === outcome) {
-      gameState.balance += amount;
-      resultEl.textContent = "🎉 You WON!";
-      winSound.play();
-    } else {
-      gameState.balance -= amount;
-      resultEl.textContent = "😢 You LOST!";
-      loseSound.play();
-    }
-
-    updateBalanceDisplay();
-  }, 1000);
-}
-
-async function deposit() {
-  const input = document.getElementById("depositAmount");
-  const amount = parseFloat(input.value);
-  if (!isNaN(amount) && amount > 0) {
-    if (!gameState.tonConnectUI) {
-      alert("Wallet not connected.");
-      return;
-    }
-
-    const nanotons = Math.floor(amount * 1e9).toString();
-
-    const tx = {
-      validUntil: Math.floor(Date.now() / 1000) + 300,
-      messages: [
-        {
-          address: "UQAmyVyYj0GqYxYhINVXgzERiEe8Sa8c03mbV2Q8yYAMKvxg",
-          amount: nanotons
-        }
-      ]
-    };
-
-    try {
-      await gameState.tonConnectUI.sendTransaction(tx);
-      gameState.balance += amount;
-      updateBalanceDisplay();
-      alert(`Deposited ${amount} TON!`);
-    } catch (err) {
-      alert("Transaction canceled or failed.");
-    }
-  }
-}
-
-function withdraw() {
-  if (gameState.balance <= 0) {
-    alert("No balance to withdraw.");
-    return;
-  }
-  alert(`Withdrawal of ${gameState.balance.toFixed(2)} TON requested. It will be processed manually.`);
-  gameState.balance = 0;
-  updateBalanceDisplay();
-}
-
-async function initTonConnect() {
-  if (typeof TON_CONNECT_UI === 'undefined') return;
-  gameState.tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
-    manifestUrl: "https://suomis7-netizen.github.io/fliptoncoin/tonconnect-manifest.json",
-    buttonRootId: "ton-connect"
-  });
-}
-
-</script>
+    });
+  </script>
 </body>
 </html>
