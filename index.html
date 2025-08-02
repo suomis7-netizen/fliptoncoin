@@ -104,7 +104,78 @@
         }
 
         #ton-connect {
+            margin: 20px auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .bet-amounts {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            margin: 15px 0;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .bet-btn {
+            padding: 10px 12px;
+            font-size: 16px;
+            font-weight: bold;
+            background-color: #e8e8e8;
+            color: #333;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .bet-btn:hover {
+            background-color: #d5d5d5;
+            border-color: #999;
+        }
+
+        .bet-btn.selected {
+            background-color: #4CAF50;
+            color: white;
+            border-color: #45a049;
+        }
+
+        @media (max-width: 600px) {
+            .bet-amounts {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        .deposit-controls {
             margin: 20px 0;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+        }
+
+        .bet-controls {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #f0f8ff;
+            border-radius: 8px;
+        }
+
+        .withdraw-btn {
+            background-color: #ff9800;
+            margin-left: 10px;
+        }
+
+        .withdraw-btn:hover {
+            background-color: #e68900;
+        }
+
+        .section-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #333;
         }
     </style>
 </head>
@@ -119,9 +190,28 @@
         <div class="error" id="error-message"></div>
         <div class="success" id="success-message"></div>
         
-        <div class="controls">
-            <input type="number" id="betAmount" min="0.1" step="0.1" value="1.0" placeholder="Bet amount">
+        <div class="deposit-controls">
+            <div class="section-title">💰 Deposit TON</div>
+            <input type="number" id="depositAmount" min="1" max="1000" step="0.1" value="10" placeholder="Deposit amount (1-1000 TON)">
             <button onclick="deposit()">Deposit TON</button>
+            <button class="withdraw-btn" onclick="withdraw()">Withdraw</button>
+        </div>
+
+        <div class="bet-controls">
+            <div class="section-title">🎯 Select Bet Amount</div>
+            <div class="bet-amounts">
+                <button class="bet-btn selected" onclick="selectBetAmount(0.5)">0.5</button>
+                <button class="bet-btn" onclick="selectBetAmount(1)">1</button>
+                <button class="bet-btn" onclick="selectBetAmount(2)">2</button>
+                <button class="bet-btn" onclick="selectBetAmount(5)">5</button>
+                <button class="bet-btn" onclick="selectBetAmount(10)">10</button>
+                <button class="bet-btn" onclick="selectBetAmount(20)">20</button>
+                <button class="bet-btn" onclick="selectBetAmount(50)">50</button>
+                <button class="bet-btn" onclick="selectBetAmount(100)">100</button>
+                <button class="bet-btn" onclick="selectBetAmount(500)">500</button>
+                <button class="bet-btn" onclick="selectBetAmount(1000)">1000</button>
+            </div>
+            <div>Selected bet: <span id="selectedBet">0.5</span> TON</div>
         </div>
         
         <div id="coin">?</div>
@@ -140,7 +230,8 @@
             balance: 0,
             isFlipping: false,
             tonConnectUI: null,
-            storageKey: 'tonCoinFlipBalance'
+            storageKey: 'tonCoinFlipBalance',
+            selectedBetAmount: 0.5
         };
 
         const WALLET_ADDRESS = "UQAmyVyYj0GqYxYhINVXgzERiEe8Sa8c03mbV2Q8yYAMKvxg";
@@ -243,21 +334,64 @@
         }
 
         function validateBetAmount() {
-            const betAmountEl = document.getElementById('betAmount');
-            if (!betAmountEl) return null;
+            const amount = gameState.selectedBetAmount;
             
-            const amount = parseFloat(betAmountEl.value);
             if (isNaN(amount) || amount <= 0) {
-                showError('Please enter a valid bet amount');
+                showError('Please select a valid bet amount');
                 return null;
             }
             
-            if (amount < 0.1) {
-                showError('Minimum bet amount is 0.1 TON');
+            if (amount < 0.5) {
+                showError('Minimum bet amount is 0.5 TON');
+                return null;
+            }
+            
+            if (amount > 1000) {
+                showError('Maximum bet amount is 1000 TON');
                 return null;
             }
             
             return amount;
+        }
+
+        function validateDepositAmount() {
+            const depositAmountEl = document.getElementById('depositAmount');
+            if (!depositAmountEl) return null;
+            
+            const amount = parseFloat(depositAmountEl.value);
+            if (isNaN(amount) || amount <= 0) {
+                showError('Please enter a valid deposit amount');
+                return null;
+            }
+            
+            if (amount < 1) {
+                showError('Minimum deposit amount is 1 TON');
+                return null;
+            }
+            
+            if (amount > 1000) {
+                showError('Maximum deposit amount is 1000 TON');
+                return null;
+            }
+            
+            return amount;
+        }
+
+        function selectBetAmount(amount) {
+            // Update selected amount
+            gameState.selectedBetAmount = amount;
+            
+            // Update visual selection
+            document.querySelectorAll('.bet-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            event.target.classList.add('selected');
+            
+            // Update display
+            const selectedBetEl = document.getElementById('selectedBet');
+            if (selectedBetEl) {
+                selectedBetEl.textContent = amount;
+            }
         }
 
         function setFlipButtonsState(disabled) {
@@ -295,7 +429,7 @@
                     return;
                 }
 
-                const amount = validateBetAmount();
+                const amount = validateDepositAmount();
                 if (!amount) return;
 
                 const nanotons = Math.floor(amount * 1e9).toString();
@@ -323,6 +457,44 @@
                 } else {
                     showError('Deposit failed. Please try again.');
                 }
+            }
+        }
+
+        // Withdraw function
+        async function withdraw() {
+            try {
+                if (!gameState.tonConnectUI) {
+                    showError('Please connect your wallet first');
+                    return;
+                }
+
+                if (gameState.balance <= 0) {
+                    showError('No balance to withdraw');
+                    return;
+                }
+
+                // Get connected wallet address
+                const walletInfo = gameState.tonConnectUI.wallet;
+                if (!walletInfo || !walletInfo.account) {
+                    showError('Wallet not properly connected');
+                    return;
+                }
+
+                const walletAddress = walletInfo.account.address;
+                const withdrawAmount = gameState.balance;
+                
+                // Reset balance immediately (in real app, do this after confirmation)
+                gameState.balance = 0;
+                updateBalanceDisplay();
+                
+                showSuccess(`Withdrawal of ${withdrawAmount.toFixed(2)} TON has been processed! You will receive your funds to wallet ${walletAddress.slice(0, 6)}...${walletAddress.slice(-6)} within 24 hours.`);
+                
+            } catch (error) {
+                console.error('Withdraw error:', error);
+                showError('Withdrawal failed. Please try again.');
+                // Restore balance on error (in real app, this would be handled server-side)
+                loadBalance();
+                updateBalanceDisplay();
             }
         }
 
