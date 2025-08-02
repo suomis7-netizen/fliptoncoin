@@ -1,179 +1,71 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>flip TON coin</title>
-  <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
-  <script src="https://unpkg.com/ton-core@0.0.5"></script>
-  <style>
-    body {
-      font-family: sans-serif;
-      text-align: center;
-      padding: 2rem;
-      background: #f0f0f0;
+<script>
+  const playerState = {
+    balance: 0,
+  };
+
+  const walletAddress = "UQAmyVyYj0GqYxYhINVXgzERiEe8Sa8c03mbV2Q8yYAMKvxg";
+
+  const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
+    manifestUrl: "https://suomis7-netizen.github.io/fliptoncoin/tonconnect-manifest.json",
+    buttonRootId: "ton-connect"
+  });
+
+  function updateBalanceDisplay() {
+    document.getElementById('balance').textContent = `Your in-game balance: ${playerState.balance.toFixed(2)} TON`;
+  }
+
+  async function deposit() {
+    try {
+      const selectedAmount = document.getElementById('betAmount').value;
+      const nanotons = (parseFloat(selectedAmount) * 1e9).toString();
+
+      const tx = {
+        validUntil: Math.floor(Date.now() / 1000) + 360,
+        messages: [
+          {
+            address: walletAddress,
+            amount: nanotons
+          }
+        ]
+      };
+
+      await tonConnectUI.sendTransaction(tx);
+      playerState.balance += parseFloat(selectedAmount);
+      updateBalanceDisplay();
+      alert("Deposit successful!");
+    } catch (e) {
+      alert("❌ Deposit cancelled or failed.");
+      console.error(e);
     }
-    h1 {
-      font-size: 2.2rem;
+  }
+
+  function flip(userChoice) {
+    const selectedAmount = parseFloat(document.getElementById('betAmount').value);
+
+    if (playerState.balance < selectedAmount) {
+      alert("Not enough balance. Please deposit more TON.");
+      return;
     }
-    .coin {
-      margin: 2rem auto;
-      width: 100px;
-      height: 100px;
-      border-radius: 50%;
-      background: gold;
-      line-height: 100px;
-      font-size: 2rem;
-      color: white;
-      font-weight: bold;
-      animation: none;
-    }
-    @keyframes flip {
-      0%   { transform: rotateY(0deg); }
-      100% { transform: rotateY(360deg); }
-    }
-    button.game-button {
-      margin: 0.5rem;
-      padding: 0.7rem 1.5rem;
-      font-size: 1.1rem;
-      cursor: pointer;
-      background: #007bff;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      transition: background 0.3s;
-    }
-    button.game-button:hover {
-      background: #0056b3;
-    }
-    select {
-      padding: 0.5rem;
-      font-size: 1rem;
-      margin-bottom: 1rem;
-    }
-    #ton-connect {
-      display: flex;
-      justify-content: center;
-      margin-bottom: 1rem;
-    }
-  </style>
-</head>
-<body>
-  <h1>flip TON coin</h1>
 
-  <!-- TonConnect prisijungimo mygtukas -->
-  <div id="ton-connect"></div>
+    const coin = document.getElementById('coin');
+    const result = document.getElementById('result');
+    coin.style.animation = 'flip 1s linear';
 
-  <!-- Monetos -->
-  <div class="coin" id="coin">?</div>
+    setTimeout(() => {
+      coin.style.animation = 'none';
+      const outcome = Math.random() < 0.5 ? 'heads' : 'tails';
+      coin.textContent = outcome === 'heads' ? 'H' : 'T';
 
-  <!-- Statymo pasirinkimas -->
-  <div>
-    <label for="betAmount">Choose your bet:</label>
-    <select id="betAmount">
-      <option value="0.1">0.1 TON</option>
-      <option value="1">1 TON</option>
-      <option value="2">2 TON</option>
-      <option value="5">5 TON</option>
-      <option value="10">10 TON</option>
-      <option value="20">20 TON</option>
-      <option value="50">50 TON</option>
-      <option value="100">100 TON</option>
-    </select>
-    <br />
-    <button class="game-button" onclick="deposit()">Deposit</button>
-  </div>
-
-  <!-- Spėjimo mygtukai -->
-  <div>
-    <button class="game-button" onclick="flip('heads')">Heads</button>
-    <button class="game-button" onclick="flip('tails')">Tails</button>
-  </div>
-
-  <p id="result"></p>
-  <p id="balance"></p>
-
-  <script>
-    const contractAddress = "EQDX9mDOtrux4xqlzWIl5OjPECsv1OEHwCLp1Tm5okfb1qKQ";
-
-    const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
-      manifestUrl: "https://suomis7-netizen.github.io/fliptoncoin/tonconnect-manifest.json",
-      buttonRootId: "ton-connect"
-    });
-
-    async function deposit() {
-      try {
-        const selectedAmount = document.getElementById('betAmount').value;
-        const nanotons = (parseFloat(selectedAmount) * 1e9).toString();
-
-        const tx = {
-          validUntil: Math.floor(Date.now() / 1000) + 360,
-          messages: [
-            {
-              address: contractAddress,
-              amount: nanotons
-            }
-          ]
-        };
-
-        await tonConnectUI.sendTransaction(tx);
-        alert("Deposit sent!");
-      } catch (e) {
-        alert("❌ Deposit cancelled or failed.");
-        console.error(e);
+      if (userChoice === outcome) {
+        playerState.balance += selectedAmount;
+        result.textContent = '🎉 You WON!';
+      } else {
+        playerState.balance -= selectedAmount;
+        result.textContent = '😢 You LOST!';
       }
-    }
+      updateBalanceDisplay();
+    }, 1000);
+  }
 
-    async function flip(userChoice) {
-      try {
-        const payload = btoa(userChoice);
-
-        const tx = {
-          validUntil: Math.floor(Date.now() / 1000) + 360,
-          messages: [
-            {
-              address: contractAddress,
-              amount: "0", // naudojame jau įneštą balansą
-              payload: payload
-            }
-          ]
-        };
-
-        await tonConnectUI.sendTransaction(tx);
-
-        document.getElementById('result').textContent = 'Waiting for result...';
-
-        setTimeout(async () => {
-          const connectedWallet = await tonConnectUI.connector.getWalletInfo();
-          if (!connectedWallet || !connectedWallet.account.address) return;
-
-          const userAddress = connectedWallet.account.address;
-          const apiUrl = `https://tonapi.io/v2/smart-contracts/${contractAddress}/run/get_last_result?args=${userAddress}`;
-          const balanceUrl = `https://tonapi.io/v2/smart-contracts/${contractAddress}/run/get_balance?args=${userAddress}`;
-
-          const [res, bal] = await Promise.all([
-            fetch(apiUrl),
-            fetch(balanceUrl)
-          ]);
-
-          const resultData = await res.json();
-          const balanceData = await bal.json();
-
-          const lastBet = resultData.stack[1][1];
-          const lastWin = resultData.stack[0][1] === 'true';
-          const balance = parseFloat(balanceData.stack[0][1]) / 1e9;
-
-          document.getElementById('coin').textContent = lastWin ? 'H' : 'T';
-          document.getElementById('result').textContent = lastWin ? '🎉 You WON!' : '😢 You LOST!';
-          document.getElementById('balance').textContent = `Your balance: ${balance.toFixed(3)} TON`;
-
-        }, 5000);
-
-      } catch (e) {
-        alert("❌ Transaction cancelled or failed.");
-        console.error(e);
-      }
-    }
-  </script>
-</body>
-</html>
+  updateBalanceDisplay();
+</script>
