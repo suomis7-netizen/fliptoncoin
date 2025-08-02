@@ -1,5 +1,7 @@
 {
   "url": "https://suomis7-netizen.github.io/fliptoncoin/",
   "name": "FlipTONcoin",
-  "iconUrl": "https://suomis7-netizen.github.io/fliptoncoin/icon.png"
+  "iconUrl": "https://suomis7-netizen.github.io/fliptoncoin/icon.png",
+  "address": "EQDX9mDOtrux4xqlzWIl5OjPECsv1OEHwCLp1Tm5okfb1qKQ", 
+  "network": "mainnet"
 }
