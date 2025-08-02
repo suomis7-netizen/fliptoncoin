@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>FlipTONcoin</title>
   <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
+  <script src="https://unpkg.com/ton-core@0.0.5"></script>
   <style>
     body {
       font-family: sans-serif;
@@ -78,22 +79,21 @@
 
   <!-- Spėjimo mygtukai -->
   <div>
-    <button class="game-button" onclick="flip('heads')">Heads</button>
-    <button class="game-button" onclick="flip('tails')">Tails</button>
+    <button class="game-button" onclick="flip()">Flip Coin</button>
   </div>
 
   <p id="result"></p>
+  <p id="balance"></p>
 
   <script>
-    const contractAddress = "EQDX9mDOtrux4xqlzWIl5OjPECsv1OEHwCLp1Tm5okfb1qKQ"; // tavo smartcontract adresas
+    const contractAddress = "EQDX9mDOtrux4xqlzWIl5OjPECsv1OEHwCLp1Tm5okfb1qKQ";
 
-    // Inicializuojame TonConnect UI
     const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
       manifestUrl: "https://suomis7-netizen.github.io/fliptoncoin/tonconnect-manifest.json",
       buttonRootId: "ton-connect"
     });
 
-    async function flip(userChoice) {
+    async function flip() {
       try {
         const selectedAmount = document.getElementById('betAmount').value;
         const nanotons = (parseFloat(selectedAmount) * 1e9).toString();
@@ -103,25 +103,43 @@
           messages: [
             {
               address: contractAddress,
-              amount: nanotons
+              amount: nanotons,
+              payload: undefined // jei reikia perduoti specialų duomenų bloką, galima įdėti čia
             }
           ]
         };
 
         await tonConnectUI.sendTransaction(tx);
 
-        const coin = document.getElementById('coin');
-        const result = document.getElementById('result');
-        coin.style.animation = 'flip 1s linear';
+        document.getElementById('result').textContent = 'Waiting for result...';
 
-        setTimeout(() => {
-          coin.style.animation = 'none';
-          const outcome = Math.random() < 0.5 ? 'heads' : 'tails';
-          coin.textContent = outcome === 'heads' ? 'H' : 'T';
-          result.textContent = userChoice === outcome
-            ? '🎉 You won (visual only)!'
-            : '😢 You lost (visual only).';
-        }, 1000);
+        // Palaukime kelias sekundes ir pasiimkime naujausią rezultatą
+        setTimeout(async () => {
+          const connectedWallet = await tonConnectUI.connector.getWalletInfo();
+          if (!connectedWallet || !connectedWallet.account.address) return;
+
+          const userAddress = connectedWallet.account.address;
+          const apiUrl = `https://tonapi.io/v2/smart-contracts/${contractAddress}/run/get_last_result?args=${userAddress}`;
+          const balanceUrl = `https://tonapi.io/v2/smart-contracts/${contractAddress}/run/get_balance?args=${userAddress}`;
+
+          const [res, bal] = await Promise.all([
+            fetch(apiUrl),
+            fetch(balanceUrl)
+          ]);
+
+          const resultData = await res.json();
+          const balanceData = await bal.json();
+
+          const lastBet = resultData.stack[1][1];
+          const lastWin = resultData.stack[0][1] === 'true';
+
+          const balance = parseFloat(balanceData.stack[0][1]) / 1e9;
+
+          document.getElementById('coin').textContent = lastWin ? 'H' : 'T';
+          document.getElementById('result').textContent = lastWin ? '🎉 You WON!' : '😢 You LOST!';
+          document.getElementById('balance').textContent = `Your balance: ${balance.toFixed(3)} TON`;
+
+        }, 5000);
 
       } catch (e) {
         alert("❌ Transaction cancelled or failed.");
