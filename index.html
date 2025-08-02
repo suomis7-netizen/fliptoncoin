@@ -4,8 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Flip TON Coin</title>
-  <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
-  <script src="https://unpkg.com/@tonconnect/sdk@latest/dist/tonconnect-sdk.min.js"></script>
+  <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js" async></script>
   <style>
     * {
       margin: 0;
@@ -597,15 +596,26 @@
 
     // Initialize TON Connect
     document.addEventListener("DOMContentLoaded", function () {
-      initializeTonConnect();
+      // Show backup button immediately
+      showFallbackWalletButton();
+      
+      // Try to initialize TON Connect
+      setTimeout(initializeTonConnect, 1000);
     });
 
     async function initializeTonConnect() {
       try {
-        if (typeof TonConnectUI !== 'undefined') {
-          tonConnect = new TonConnectUI({
-            manifestUrl: 'https://suomis7-netizen.github.io/fliptoncoin/tonconnect-manifest.json',
-            buttonRootId: 'ton-connect'
+        // Wait for library to load
+        let attempts = 0;
+        while (typeof TON_CONNECT_UI === 'undefined' && attempts < 50) {
+          await new Promise(resolve => setTimeout(resolve, 100));
+          attempts++;
+        }
+        
+        if (typeof TON_CONNECT_UI !== 'undefined') {
+          tonConnect = new TON_CONNECT_UI.TonConnectUI({
+            manifestUrl: "https://suomis7-netizen.github.io/fliptoncoin/tonconnect-manifest.json",
+            buttonRootId: "ton-connect"
           });
 
           // Listen for wallet connection/disconnection
@@ -630,7 +640,8 @@
             enableGameControls();
           }
         } else {
-          setTimeout(initializeTonConnect, 500);
+          console.error('TON_CONNECT_UI not loaded');
+          showFallbackWalletButton();
         }
       } catch (error) {
         console.error('TON Connect initialization error:', error);
@@ -640,11 +651,29 @@
 
     function showFallbackWalletButton() {
       document.getElementById('ton-connect').innerHTML = 
-        '<button style="padding: 12px 20px; background: linear-gradient(135deg, #0088cc, #005fa3); color: white; border: none; border-radius: 12px; cursor: pointer; font-weight: 600; box-shadow: 0 8px 24px rgba(0, 136, 204, 0.4); transition: all 0.3s ease;" onclick="connectWalletFallback()">🔗 Connect Wallet</button>';
+        '<button style="padding: 12px 20px; background: linear-gradient(135deg, #0088cc, #005fa3); color: white; border: none; border-radius: 12px; cursor: pointer; font-weight: 600; box-shadow: 0 8px 24px rgba(0, 136, 204, 0.4); transition: all 0.3s ease; position: relative; overflow: hidden;" onclick="connectWalletFallback()" onmouseover="this.style.transform=\'translateY(-2px)\'" onmouseout="this.style.transform=\'translateY(0px)\'">🔗 Connect Wallet</button>';
     }
 
     function connectWalletFallback() {
-      showMessage('⚠️ Please install a TON wallet extension or use TON Connect compatible wallet', 'error');
+      // Simulate connection for demo
+      gameState.connected = true;
+      gameState.balance = 100.00;
+      updateDisplay();
+      enableGameControls();
+      showMessage('✅ Demo wallet connected! (This is a demo connection)', 'success');
+      
+      // Update button text
+      document.getElementById('ton-connect').innerHTML = 
+        '<button style="padding: 12px 20px; background: linear-gradient(135deg, #22c55e, #16a34a); color: white; border: none; border-radius: 12px; cursor: pointer; font-weight: 600; box-shadow: 0 8px 24px rgba(34, 197, 94, 0.4); transition: all 0.3s ease;" onclick="disconnectWallet()">✅ Connected</button>';
+    }
+
+    function disconnectWallet() {
+      gameState.connected = false;
+      gameState.balance = 0;
+      updateDisplay();
+      disableGameControls();
+      showMessage('❌ Wallet disconnected', 'error');
+      showFallbackWalletButton();
     }
 
     async function updateWalletInfo(wallet) {
