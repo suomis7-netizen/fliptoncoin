@@ -543,7 +543,9 @@
         <input type="number" id="depositAmount" placeholder="1.0" min="0.1" step="0.1">
         <button class="deposit" onclick="deposit()" id="depositBtn" disabled>💳 Deposit</button>
       </div>
-      <div id="ton-connect"></div>
+      <div id="ton-connect">
+        <button style="padding: 12px 20px; background: linear-gradient(135deg, #0088cc, #005fa3); color: white; border: none; border-radius: 12px; cursor: pointer; font-weight: 600; box-shadow: 0 8px 24px rgba(0, 136, 204, 0.4); transition: all 0.3s ease;" onclick="connectWallet()">🔗 Connect Wallet</button>
+      </div>
       <div class="wallet-section">
         <input type="number" id="withdrawAmount" placeholder="1.0" min="0.1" step="0.1">
         <button class="withdraw" onclick="withdraw()" id="withdrawBtn" disabled>💸 Withdraw</button>
