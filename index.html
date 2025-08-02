@@ -8,144 +8,570 @@
   <script src="https://unpkg.com/ton-core@0.0.5"></script>
   <style>
     body {
-      font-family: sans-serif;
+      font-family: 'Arial', sans-serif;
       text-align: center;
       padding: 2rem;
-      background: #f0f0f0;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      color: white;
+      margin: 0;
     }
+    
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+    }
+    
     h1 {
-      font-size: 2.2rem;
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
     }
+    
+    .subtitle {
+      opacity: 0.8;
+      margin-bottom: 30px;
+      font-size: 1.1rem;
+    }
+    
+    .wallet-section {
+      margin-bottom: 30px;
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+    }
+    
+    .balance-info {
+      display: flex;
+      justify-content: space-around;
+      margin-bottom: 20px;
+      gap: 15px;
+    }
+    
+    .balance-item {
+      background: rgba(255, 255, 255, 0.2);
+      padding: 15px;
+      border-radius: 10px;
+      flex: 1;
+    }
+    
+    .balance-label {
+      font-size: 0.9rem;
+      opacity: 0.8;
+      margin-bottom: 5px;
+    }
+    
+    .balance-value {
+      font-size: 1.3rem;
+      font-weight: bold;
+    }
+    
+    .deposit-section {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+      align-items: center;
+    }
+    
     .coin {
       margin: 2rem auto;
-      width: 100px;
-      height: 100px;
+      width: 120px;
+      height: 120px;
       border-radius: 50%;
-      background: gold;
-      line-height: 100px;
-      font-size: 2rem;
-      color: white;
+      background: linear-gradient(45deg, #ffd700, #ffed4e);
+      line-height: 120px;
+      font-size: 2.5rem;
+      color: #8b4513;
       font-weight: bold;
-      animation: none;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+      transition: transform 0.3s;
     }
+    
+    .coin.flipping {
+      animation: flip 1.5s ease-in-out;
+    }
+    
     @keyframes flip {
-      0%   { transform: rotateY(0deg); }
-      100% { transform: rotateY(360deg); }
+      0% { transform: rotateY(0deg); }
+      50% { transform: rotateY(1800deg) scale(1.1); }
+      100% { transform: rotateY(3600deg); }
     }
-    button.game-button {
-      margin: 0.5rem;
-      padding: 0.7rem 1.5rem;
+    
+    .bet-section {
+      margin: 20px 0;
+    }
+    
+    .bet-input {
+      padding: 12px 20px;
       font-size: 1.1rem;
-      cursor: pointer;
-      background: #007bff;
-      color: white;
       border: none;
+      border-radius: 10px;
+      text-align: center;
+      background: rgba(255, 255, 255, 0.9);
+      color: #333;
+      width: 200px;
+      margin-bottom: 15px;
+    }
+    
+    .quick-bet {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin: 15px 0;
+      flex-wrap: wrap;
+    }
+    
+    .quick-bet-btn {
+      padding: 8px 15px;
+      background: rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.3);
       border-radius: 8px;
-      transition: background 0.3s;
+      color: white;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-size: 0.9rem;
     }
+    
+    .quick-bet-btn:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: translateY(-2px);
+    }
+    
+    .game-buttons {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      margin: 30px 0;
+    }
+    
+    button.game-button {
+      padding: 15px 40px;
+      font-size: 1.2rem;
+      cursor: pointer;
+      border: none;
+      border-radius: 15px;
+      font-weight: bold;
+      text-transform: uppercase;
+      transition: all 0.3s;
+      min-width: 120px;
+    }
+    
+    .game-button.heads {
+      background: linear-gradient(45deg, #ff6b6b, #ee5a5a);
+      color: white;
+    }
+    
+    .game-button.tails {
+      background: linear-gradient(45deg, #4ecdc4, #44a08d);
+      color: white;
+    }
+    
     button.game-button:hover {
-      background: #0056b3;
+      transform: translateY(-3px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
     }
-    select {
-      padding: 0.5rem;
+    
+    button.game-button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    .btn {
+      padding: 12px 25px;
       font-size: 1rem;
-      margin-bottom: 1rem;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-weight: bold;
+    }
+    
+    .btn-deposit {
+      background: linear-gradient(45deg, #45b7d1, #96c93d);
+      color: white;
+      flex: 1;
+    }
+    
+    .btn-withdraw {
+      background: linear-gradient(45deg, #f093fb, #f5576c);
+      color: white;
+      width: 100%;
+      margin-top: 10px;
+    }
+    
+    .btn:hover {
+      transform: translateY(-2px);
+    }
+    
+    .result {
+      margin: 20px 0;
+      padding: 15px;
+      border-radius: 10px;
+      font-size: 1.3rem;
+      font-weight: bold;
+      min-height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .result.win {
+      background: rgba(76, 175, 80, 0.3);
+      border: 2px solid #4caf50;
+      color: #4caf50;
+    }
+    
+    .result.lose {
+      background: rgba(244, 67, 54, 0.3);
+      border: 2px solid #f44336;
+      color: #f44336;
+    }
+    
+    .result.waiting {
+      background: rgba(255, 193, 7, 0.3);
+      border: 2px solid #ffc107;
+      color: #ffc107;
+    }
+    
+    .loading {
+      display: none;
+      margin: 20px 0;
+    }
+    
+    .spinner {
+      border: 4px solid rgba(255, 255, 255, 0.3);
+      border-top: 4px solid #fff;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    #ton-connect {
+      margin-bottom: 20px;
+    }
+    
+    .game-section {
+      display: none;
+    }
+    
+    .disabled {
+      pointer-events: none;
+      opacity: 0.6;
     }
   </style>
 </head>
 <body>
-  <h1>FlipTONcoin</h1>
+  <div class="container">
+    <h1>🪙 FlipTONcoin</h1>
+    <p class="subtitle">Head & Tail žaidimas su deposit sistema</p>
 
-  <!-- TonConnect prisijungimo mygtukas -->
-  <div id="ton-connect"></div>
+    <!-- TonConnect -->
+    <div id="ton-connect"></div>
 
-  <!-- Monetos -->
-  <div class="coin" id="coin">?</div>
+    <!-- Wallet Info -->
+    <div class="wallet-section" id="wallet-section" style="display: none;">
+      <div class="balance-info">
+        <div class="balance-item">
+          <div class="balance-label">Wallet balansas</div>
+          <div class="balance-value" id="wallet-balance">0 TON</div>
+        </div>
+        <div class="balance-item">
+          <div class="balance-label">Žaidimo balansas</div>
+          <div class="balance-value" id="game-balance">0 TON</div>
+        </div>
+      </div>
+      
+      <div class="deposit-section">
+        <input type="number" id="deposit-amount" class="bet-input" placeholder="Suma TON" min="0.1" step="0.1" value="1">
+        <button class="btn btn-deposit" onclick="deposit()">Deposit</button>
+      </div>
+      
+      <button class="btn btn-withdraw" onclick="withdraw()">Withdraw visą balansą</button>
+    </div>
 
-  <!-- Statymo pasirinkimas -->
-  <div>
-    <label for="betAmount">Choose your bet:</label>
-    <select id="betAmount">
-      <option value="0.1">0.1 TON</option>
-      <option value="1">1 TON</option>
-      <option value="2">2 TON</option>
-      <option value="5">5 TON</option>
-      <option value="10">10 TON</option>
-      <option value="20">20 TON</option>
-      <option value="50">50 TON</option>
-      <option value="100">100 TON</option>
-    </select>
+    <!-- Game Section -->
+    <div class="game-section" id="game-section">
+      <!-- Coin -->
+      <div class="coin" id="coin">?</div>
+
+      <!-- Bet Section -->
+      <div class="bet-section">
+        <input type="number" id="bet-amount" class="bet-input" placeholder="Statymo suma TON" min="0.1" step="0.1" value="1">
+        
+        <div class="quick-bet">
+          <button class="quick-bet-btn" onclick="setBet(0.1)">0.1</button>
+          <button class="quick-bet-btn" onclick="setBet(0.5)">0.5</button>
+          <button class="quick-bet-btn" onclick="setBet(1)">1</button>
+          <button class="quick-bet-btn" onclick="setBet(5)">5</button>
+          <button class="quick-bet-btn" onclick="setBet(10)">10</button>
+          <button class="quick-bet-btn" onclick="setBet(50)">50</button>
+        </div>
+      </div>
+
+      <!-- Game Buttons -->
+      <div class="game-buttons">
+        <button class="game-button heads" onclick="playGame('heads')" id="heads-btn">
+          👤 Heads
+        </button>
+        <button class="game-button tails" onclick="playGame('tails')" id="tails-btn">
+          🔄 Tails
+        </button>
+      </div>
+
+      <!-- Result -->
+      <div class="result" id="result" style="display: none;"></div>
+      
+      <!-- Loading -->
+      <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <p>Laukiame rezultato...</p>
+      </div>
+    </div>
   </div>
-
-  <!-- Spėjimo mygtukai -->
-  <div>
-    <button class="game-button" onclick="flip('heads')">Heads</button>
-    <button class="game-button" onclick="flip('tails')">Tails</button>
-  </div>
-
-  <p id="result"></p>
-  <p id="balance"></p>
 
   <script>
     const contractAddress = "EQDX9mDOtrux4xqlzWIl5OjPECsv1OEHwCLp1Tm5okfb1qKQ";
+    let userAddress = null;
+    let gameBalance = 0;
+    let isPlaying = false;
 
     const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
       manifestUrl: "https://suomis7-netizen.github.io/fliptoncoin/tonconnect-manifest.json",
       buttonRootId: "ton-connect"
     });
 
-    async function flip(userChoice) {
-      try {
-        const selectedAmount = document.getElementById('betAmount').value;
-        const nanotons = (parseFloat(selectedAmount) * 1e9).toString();
+    // Monitor wallet connection
+    tonConnectUI.onStatusChange(wallet => {
+      if (wallet) {
+        userAddress = wallet.account.address;
+        document.getElementById('wallet-section').style.display = 'block';
+        document.getElementById('game-section').style.display = 'block';
+        updateBalances();
+      } else {
+        userAddress = null;
+        document.getElementById('wallet-section').style.display = 'none';
+        document.getElementById('game-section').style.display = 'none';
+      }
+    });
 
-        const payload = btoa(userChoice); // heads or tails as base64
+    // Update balances
+    async function updateBalances() {
+      if (!userAddress) return;
+      
+      try {
+        // Get wallet balance
+        const walletResponse = await fetch(`https://tonapi.io/v2/accounts/${userAddress}`);
+        const walletData = await walletResponse.json();
+        const walletBalance = (walletData.balance / 1e9).toFixed(3);
+        document.getElementById('wallet-balance').textContent = `${walletBalance} TON`;
+
+        // Get game balance
+        const gameResponse = await fetch(`https://tonapi.io/v2/smart-contracts/${contractAddress}/run/get_balance?args=${userAddress}`);
+        const gameData = await gameResponse.json();
+        gameBalance = parseFloat(gameData.stack[0][1]) / 1e9;
+        document.getElementById('game-balance').textContent = `${gameBalance.toFixed(3)} TON`;
+        
+      } catch (error) {
+        console.error('Error updating balances:', error);
+      }
+    }
+
+    // Deposit function
+    async function deposit() {
+      const amount = document.getElementById('deposit-amount').value;
+      if (!amount || amount <= 0) {
+        alert('Įveskite teisingą sumą');
+        return;
+      }
+
+      try {
+        const nanotons = (parseFloat(amount) * 1e9).toString();
 
         const tx = {
           validUntil: Math.floor(Date.now() / 1000) + 360,
           messages: [
             {
               address: contractAddress,
-              amount: nanotons,
-              payload: payload // perduodame heads/tails pasirinkimą
+              amount: nanotons
+            }
+          ]
+        };
+
+        await tonConnectUI.sendTransaction(tx);
+        
+        // Wait and update balances
+        setTimeout(() => {
+          updateBalances();
+        }, 3000);
+        
+      } catch (error) {
+        console.error('Deposit error:', error);
+        alert('Deposit nepavyko');
+      }
+    }
+
+    // Withdraw function
+    async function withdraw() {
+      if (gameBalance <= 0) {
+        alert('Nėra lėšų išėmimui');
+        return;
+      }
+
+      try {
+        const withdrawAmount = Math.floor(gameBalance * 1e9);
+        
+        const tx = {
+          validUntil: Math.floor(Date.now() / 1000) + 360,
+          messages: [
+            {
+              address: contractAddress,
+              amount: "50000000", // Gas fee
+              payload: btoa(`withdraw:${withdrawAmount}`)
+            }
+          ]
+        };
+
+        await tonConnectUI.sendTransaction(tx);
+        
+        setTimeout(() => {
+          updateBalances();
+        }, 3000);
+        
+      } catch (error) {
+        console.error('Withdraw error:', error);
+        alert('Withdraw nepavyko');
+      }
+    }
+
+    // Set bet amount
+    function setBet(amount) {
+      document.getElementById('bet-amount').value = amount;
+    }
+
+    // Play game
+    async function playGame(choice) {
+      if (isPlaying) return;
+      
+      const betAmount = parseFloat(document.getElementById('bet-amount').value);
+      
+      if (!betAmount || betAmount <= 0) {
+        alert('Įveskite statymo sumą');
+        return;
+      }
+      
+      if (betAmount > gameBalance) {
+        alert('Nepakanka lėšų žaidimo balanse. Papildykite balansą.');
+        return;
+      }
+
+      isPlaying = true;
+      
+      // Disable buttons
+      document.getElementById('heads-btn').disabled = true;
+      document.getElementById('tails-btn').disabled = true;
+      
+      // Show loading
+      document.getElementById('loading').style.display = 'block';
+      document.getElementById('result').style.display = 'none';
+      
+      // Animate coin
+      const coin = document.getElementById('coin');
+      coin.classList.add('flipping');
+      
+      try {
+        const nanotons = Math.floor(betAmount * 1e9).toString();
+        
+        const tx = {
+          validUntil: Math.floor(Date.now() / 1000) + 360,
+          messages: [
+            {
+              address: contractAddress,
+              amount: "50000000", // Gas fee
+              payload: btoa(`play:${nanotons}:${choice}`)
             }
           ]
         };
 
         await tonConnectUI.sendTransaction(tx);
 
-        document.getElementById('result').textContent = 'Waiting for result...';
-
+        // Wait for result
         setTimeout(async () => {
-          const connectedWallet = await tonConnectUI.connector.getWalletInfo();
-          if (!connectedWallet || !connectedWallet.account.address) return;
-
-          const userAddress = connectedWallet.account.address;
-          const apiUrl = `https://tonapi.io/v2/smart-contracts/${contractAddress}/run/get_last_result?args=${userAddress}`;
-          const balanceUrl = `https://tonapi.io/v2/smart-contracts/${contractAddress}/run/get_balance?args=${userAddress}`;
-
-          const [res, bal] = await Promise.all([
-            fetch(apiUrl),
-            fetch(balanceUrl)
-          ]);
-
-          const resultData = await res.json();
-          const balanceData = await bal.json();
-
-          const lastBet = resultData.stack[1][1];
-          const lastWin = resultData.stack[0][1] === 'true';
-          const balance = parseFloat(balanceData.stack[0][1]) / 1e9;
-
-          document.getElementById('coin').textContent = lastWin ? 'H' : 'T';
-          document.getElementById('result').textContent = lastWin ? '🎉 You WON!' : '😢 You LOST!';
-          document.getElementById('balance').textContent = `Your balance: ${balance.toFixed(3)} TON`;
-
+          try {
+            const resultResponse = await fetch(`https://tonapi.io/v2/smart-contracts/${contractAddress}/run/get_last_result?args=${userAddress}`);
+            const resultData = await resultResponse.json();
+            
+            const lastWin = resultData.stack[0][1] === 'true';
+            const lastBet = parseFloat(resultData.stack[1][1]) / 1e9;
+            
+            // Update coin
+            coin.textContent = choice === 'heads' ? (lastWin ? '👤' : '🔄') : (lastWin ? '🔄' : '👤');
+            coin.classList.remove('flipping');
+            
+            // Show result
+            const resultDiv = document.getElementById('result');
+            if (lastWin) {
+              resultDiv.textContent = `🎉 Laimėjote! +${lastBet} TON`;
+              resultDiv.className = 'result win';
+            } else {
+              resultDiv.textContent = `😢 Pralaimėjote! -${lastBet} TON`;
+              resultDiv.className = 'result lose';
+            }
+            
+            resultDiv.style.display = 'block';
+            
+            // Update balances
+            await updateBalances();
+            
+          } catch (error) {
+            console.error('Error getting result:', error);
+            document.getElementById('result').textContent = 'Klaida gaunant rezultatą';
+            document.getElementById('result').className = 'result';
+            document.getElementById('result').style.display = 'block';
+          }
+          
+          // Hide loading
+          document.getElementById('loading').style.display = 'none';
+          
+          // Enable buttons
+          document.getElementById('heads-btn').disabled = false;
+          document.getElementById('tails-btn').disabled = false;
+          
+          isPlaying = false;
+          
         }, 5000);
 
-      } catch (e) {
-        alert("❌ Transaction cancelled or failed.");
-        console.error(e);
+      } catch (error) {
+        console.error('Game error:', error);
+        alert('Žaidimas nepavyko');
+        
+        // Reset state
+        coin.classList.remove('flipping');
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('heads-btn').disabled = false;
+        document.getElementById('tails-btn').disabled = false;
+        isPlaying = false;
       }
+    }
+
+    // Initialize
+    if (tonConnectUI.wallet) {
+      userAddress = tonConnectUI.wallet.account.address;
+      document.getElementById('wallet-section').style.display = 'block';
+      document.getElementById('game-section').style.display = 'block';
+      updateBalances();
     }
   </script>
 </body>
