@@ -2,23 +2,49 @@
   const playerState = {
     balance: 0,
   };
-
   const walletAddress = "UQAmyVyYj0GqYxYhINVXgzERiEe8Sa8c03mbV2Q8yYAMKvxg";
-
-  const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
-    manifestUrl: "https://suomis7-netizen.github.io/fliptoncoin/tonconnect-manifest.json",
-    buttonRootId: "ton-connect"
-  });
+  
+  // Patikrinti, ar TON_CONNECT_UI biblioteka įkelta
+  let tonConnectUI;
+  try {
+    tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
+      manifestUrl: "https://suomis7-netizen.github.io/fliptoncoin/tonconnect-manifest.json",
+      buttonRootId: "ton-connect"
+    });
+  } catch (error) {
+    console.error("TON Connect UI nepavyko inicializuoti:", error);
+  }
 
   function updateBalanceDisplay() {
-    document.getElementById('balance').textContent = `Your in-game balance: ${playerState.balance.toFixed(2)} TON`;
+    const balanceElement = document.getElementById('balance');
+    if (balanceElement) {
+      balanceElement.textContent = `Your in-game balance: ${playerState.balance.toFixed(2)} TON`;
+    }
   }
 
   async function deposit() {
     try {
-      const selectedAmount = document.getElementById('betAmount').value;
-      const nanotons = (parseFloat(selectedAmount) * 1e9).toString();
+      // Patikrinti, ar tonConnectUI inicializuotas
+      if (!tonConnectUI) {
+        alert("TON Connect not initialized");
+        return;
+      }
 
+      const betAmountElement = document.getElementById('betAmount');
+      if (!betAmountElement) {
+        alert("Bet amount input not found");
+        return;
+      }
+
+      const selectedAmount = betAmountElement.value;
+      
+      // Validuoti įvestą sumą
+      if (!selectedAmount || isNaN(selectedAmount) || parseFloat(selectedAmount) <= 0) {
+        alert("Please enter a valid amount");
+        return;
+      }
+
+      const nanotons = (parseFloat(selectedAmount) * 1e9).toString();
       const tx = {
         validUntil: Math.floor(Date.now() / 1000) + 360,
         messages: [
@@ -40,7 +66,19 @@
   }
 
   function flip(userChoice) {
-    const selectedAmount = parseFloat(document.getElementById('betAmount').value);
+    const betAmountElement = document.getElementById('betAmount');
+    if (!betAmountElement) {
+      alert("Bet amount input not found");
+      return;
+    }
+
+    const selectedAmount = parseFloat(betAmountElement.value);
+    
+    // Validuoti įvestą sumą
+    if (!selectedAmount || isNaN(selectedAmount) || selectedAmount <= 0) {
+      alert("Please enter a valid bet amount");
+      return;
+    }
 
     if (playerState.balance < selectedAmount) {
       alert("Not enough balance. Please deposit more TON.");
@@ -49,13 +87,19 @@
 
     const coin = document.getElementById('coin');
     const result = document.getElementById('result');
-    coin.style.animation = 'flip 1s linear';
+    
+    if (!coin || !result) {
+      alert("Game elements not found");
+      return;
+    }
 
+    coin.style.animation = 'flip 1s linear';
+    
     setTimeout(() => {
       coin.style.animation = 'none';
       const outcome = Math.random() < 0.5 ? 'heads' : 'tails';
       coin.textContent = outcome === 'heads' ? 'H' : 'T';
-
+      
       if (userChoice === outcome) {
         playerState.balance += selectedAmount;
         result.textContent = '🎉 You WON!';
@@ -67,5 +111,8 @@
     }, 1000);
   }
 
-  updateBalanceDisplay();
+  // Inicializuoti balansą tik tada, kai puslapis pilnai užkrautas
+  document.addEventListener('DOMContentLoaded', function() {
+    updateBalanceDisplay();
+  });
 </script>
