@@ -79,7 +79,8 @@
 
   <!-- Spėjimo mygtukai -->
   <div>
-    <button class="game-button" onclick="flip()">Flip Coin</button>
+    <button class="game-button" onclick="flip('heads')">Heads</button>
+    <button class="game-button" onclick="flip('tails')">Tails</button>
   </div>
 
   <p id="result"></p>
@@ -93,10 +94,12 @@
       buttonRootId: "ton-connect"
     });
 
-    async function flip() {
+    async function flip(userChoice) {
       try {
         const selectedAmount = document.getElementById('betAmount').value;
         const nanotons = (parseFloat(selectedAmount) * 1e9).toString();
+
+        const payload = btoa(userChoice); // heads or tails as base64
 
         const tx = {
           validUntil: Math.floor(Date.now() / 1000) + 360,
@@ -104,7 +107,7 @@
             {
               address: contractAddress,
               amount: nanotons,
-              payload: undefined // jei reikia perduoti specialų duomenų bloką, galima įdėti čia
+              payload: payload // perduodame heads/tails pasirinkimą
             }
           ]
         };
@@ -113,7 +116,6 @@
 
         document.getElementById('result').textContent = 'Waiting for result...';
 
-        // Palaukime kelias sekundes ir pasiimkime naujausią rezultatą
         setTimeout(async () => {
           const connectedWallet = await tonConnectUI.connector.getWalletInfo();
           if (!connectedWallet || !connectedWallet.account.address) return;
@@ -132,7 +134,6 @@
 
           const lastBet = resultData.stack[1][1];
           const lastWin = resultData.stack[0][1] === 'true';
-
           const balance = parseFloat(balanceData.stack[0][1]) / 1e9;
 
           document.getElementById('coin').textContent = lastWin ? 'H' : 'T';
