@@ -12,5 +12,7 @@
   ],
   "bridge": {
     "type": "ton-x"
-  }
+  },
+  "address": "UQAmyVyYj0GqYxYhINVXgzERiEe8Sa8c03mbV2Q8yYAMKvxg",
+  "network": "mainnet"
 }
