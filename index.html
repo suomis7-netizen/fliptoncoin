@@ -238,93 +238,18 @@
   <audio id="loseSound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_d9ce97c839.mp3?filename=fail-1-89169.mp3"></audio>
 
   <script>
-    const gameState = {
-      balance: 0,
-      selectedBetAmount: 0.5,
-      storageKey: 'tonCoinFlipBalance'
-    };
+    let tonConnectUI;
 
-    const winSound = document.getElementById("winSound");
-    const loseSound = document.getElementById("loseSound");
-
-    function saveBalance() {
-      localStorage.setItem(gameState.storageKey, gameState.balance.toString());
+    async function initTonConnect() {
+      if (typeof TON_CONNECT_UI === 'undefined') return;
+      tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
+        manifestUrl: "https://suomis7-netizen.github.io/fliptoncoin/tonconnect-manifest.json",
+        buttonRootId: "ton-connect"
+      });
     }
 
-    function loadBalance() {
-      const saved = localStorage.getItem(gameState.storageKey);
-      if (saved && !isNaN(saved)) {
-        gameState.balance = parseFloat(saved);
-      }
-    }
-
-    function updateBalanceDisplay() {
-      document.getElementById("balance").textContent = `Your in-game balance: ${gameState.balance.toFixed(2)} TON`;
-      saveBalance();
-    }
-
-    function selectBetAmount(amount) {
-      gameState.selectedBetAmount = amount;
-      document.querySelectorAll('.bet-btn').forEach(btn => btn.classList.remove('selected'));
-      event.target.classList.add('selected');
-      document.getElementById("selectedBet").textContent = amount;
-    }
-
-    function flip(userChoice) {
-      const amount = gameState.selectedBetAmount;
-      if (gameState.balance < amount) {
-        alert("Your balance is too low. Please deposit TON before playing.");
-        return;
-      }
-
-      const coin = document.getElementById("coin");
-      const coinText = coin.querySelector(".coin-text");
-      const resultEl = document.getElementById("result");
-
-      coin.style.animation = "flip 1s linear";
-      coinText.textContent = "?";
-      resultEl.textContent = "";
-
-      setTimeout(() => {
-        coin.style.animation = "none";
-        const outcome = Math.random() < 0.5 ? "heads" : "tails";
-        coinText.textContent = outcome === "heads" ? "💎" : "T";
-
-        if (userChoice === outcome) {
-          gameState.balance += amount;
-          resultEl.textContent = "🎉 You WON!";
-          winSound.play();
-        } else {
-          gameState.balance -= amount;
-          resultEl.textContent = "😢 You LOST!";
-          loseSound.play();
-        }
-
-        updateBalanceDisplay();
-      }, 1000);
-    }
-
-    function deposit() {
-      const input = document.getElementById("depositAmount");
-      const amount = parseFloat(input.value);
-      if (!isNaN(amount) && amount > 0) {
-        gameState.balance += amount;
-        updateBalanceDisplay();
-        alert(`Deposited ${amount} TON to your game balance.`);
-      }
-    }
-
-    function withdraw() {
-      if (gameState.balance <= 0) {
-        alert("No balance to withdraw.");
-        return;
-      }
-      alert(`Withdrawal of ${gameState.balance.toFixed(2)} TON requested. It will be processed manually.`);
-      gameState.balance = 0;
-      updateBalanceDisplay();
-    }
-
-    window.onload = () => {
+    $1window.onload = async () => {
+      await initTonConnect();
       loadBalance();
       updateBalanceDisplay();
     };
