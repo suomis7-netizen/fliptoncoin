@@ -1,269 +1,333 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TON Coin Flip Game</title>
-    <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            background-color: #f0f0f0;
-            margin: 0;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-
-        h1 {
-            color: #333;
-            margin-bottom: 20px;
-        }
-
-        #balance {
-            font-size: 18px;
-            font-weight: bold;
-            margin: 20px 0;
-            padding: 10px;
-            background-color: #e8f5e8;
-            border-radius: 5px;
-        }
-
-        #coin {
-            width: 120px;
-            height: 120px;
-            background: linear-gradient(135deg, #0088cc 0%, #0066aa 50%, #004488 100%);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 28px;
-            font-weight: bold;
-            margin: 20px auto;
-            border: 4px solid #ffffff;
-            box-shadow: 0 6px 20px rgba(0, 136, 204, 0.4), inset 0 2px 4px rgba(255, 255, 255, 0.3);
-            color: white;
-            position: relative;
-            overflow: hidden;
-        }
-
-        #coin::before {
-            content: '';
-            position: absolute;
-            top: 10%;
-            left: 10%;
-            right: 10%;
-            bottom: 10%;
-            border-radius: 50%;
-            border: 2px solid rgba(255, 255, 255, 0.2);
-        }
-
-        #coin::after {
-            content: '';
-            position: absolute;
-            top: 20%;
-            left: 20%;
-            right: 20%;
-            bottom: 20%;
-            border-radius: 50%;
-            background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.3), transparent 50%);
-        }
-
-        .coin-text {
-            position: relative;
-            z-index: 2;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-        }
-
-        @keyframes flip {
-            0% { transform: rotateY(0deg); }
-            25% { transform: rotateY(90deg); box-shadow: 0 6px 15px rgba(0, 136, 204, 0.3); }
-            50% { transform: rotateY(180deg); box-shadow: 0 6px 20px rgba(0, 136, 204, 0.4); }
-            75% { transform: rotateY(270deg); box-shadow: 0 6px 15px rgba(0, 136, 204, 0.3); }
-            100% { transform: rotateY(360deg); }
-        }
-
-        .controls {
-            margin: 20px 0;
-        }
-
-        input, button {
-            margin: 5px;
-            padding: 10px;
-            font-size: 16px;
-        }
-
-        button {
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background-color: #45a049;
-        }
-
-        button:disabled {
-            background-color: #cccccc;
-            cursor: not-allowed;
-        }
-
-        #result {
-            font-size: 24px;
-            font-weight: bold;
-            margin: 20px 0;
-            min-height: 30px;
-        }
-
-        .error {
-            color: red;
-            margin: 10px 0;
-            display: none;
-        }
-
-        .success {
-            color: green;
-            margin: 10px 0;
-            display: none;
-        }
-
-        #ton-connect {
-            margin: 20px auto;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .bet-amounts {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 10px;
-            margin: 15px 0;
-            max-width: 500px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .bet-btn {
-            padding: 10px 12px;
-            font-size: 16px;
-            font-weight: bold;
-            background-color: #e8e8e8;
-            color: #333;
-            border: 2px solid #ccc;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .bet-btn:hover {
-            background-color: #d5d5d5;
-            border-color: #999;
-        }
-
-        .bet-btn.selected {
-            background-color: #4CAF50;
-            color: white;
-            border-color: #45a049;
-        }
-
-        @media (max-width: 600px) {
-            .bet-amounts {
-                grid-template-columns: repeat(3, 1fr);
-            }
-            .bet-btn.full-width-mobile {
-                grid-column: span 3;
-            }
-        }
-
-        .deposit-controls {
-            margin: 20px 0;
-            padding: 15px;
-            background-color: #f9f9f9;
-            border-radius: 8px;
-        }
-
-        .bet-controls {
-            margin: 20px 0;
-            padding: 15px;
-            background-color: #f0f8ff;
-            border-radius: 8px;
-        }
-
-        .withdraw-btn {
-            background-color: #ff9800;
-            margin-left: 10px;
-        }
-
-        .withdraw-btn:hover {
-            background-color: #e68900;
-        }
-
-        .section-title {
-            font-weight: bold;
-            margin-bottom: 10px;
-            color: #333;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TON Coin Flip Game</title>
+  <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: #f0f0f0;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #333;
+      margin-bottom: 20px;
+    }
+    #balance {
+      font-size: 18px;
+      font-weight: bold;
+      margin: 20px 0;
+      padding: 10px;
+      background-color: #e8f5e8;
+      border-radius: 5px;
+    }
+    #coin {
+      width: 120px;
+      height: 120px;
+      background: linear-gradient(135deg, #0088cc 0%, #0066aa 50%, #004488 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      font-weight: bold;
+      margin: 20px auto;
+      border: 4px solid #ffffff;
+      box-shadow: 0 6px 20px rgba(0, 136, 204, 0.4), inset 0 2px 4px rgba(255, 255, 255, 0.3);
+      color: white;
+      position: relative;
+      overflow: hidden;
+      animation-duration: 1s;
+    }
+    #coin::before {
+      content: '';
+      position: absolute;
+      top: 10%;
+      left: 10%;
+      right: 10%;
+      bottom: 10%;
+      border-radius: 50%;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+    }
+    #coin::after {
+      content: '';
+      position: absolute;
+      top: 20%;
+      left: 20%;
+      right: 20%;
+      bottom: 20%;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.3), transparent 50%);
+    }
+    .coin-text {
+      position: relative;
+      z-index: 2;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+    @keyframes flip {
+      0% { transform: rotateY(0deg); }
+      25% { transform: rotateY(90deg); box-shadow: 0 6px 15px rgba(0, 136, 204, 0.3); }
+      50% { transform: rotateY(180deg); box-shadow: 0 6px 20px rgba(0, 136, 204, 0.4); }
+      75% { transform: rotateY(270deg); box-shadow: 0 6px 15px rgba(0, 136, 204, 0.3); }
+      100% { transform: rotateY(360deg); }
+    }
+    .controls {
+      margin: 20px 0;
+    }
+    input, button {
+      margin: 5px;
+      padding: 10px;
+      font-size: 16px;
+    }
+    button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    button:disabled {
+      background-color: #cccccc;
+      cursor: not-allowed;
+    }
+    #result {
+      font-size: 24px;
+      font-weight: bold;
+      margin: 20px 0;
+      min-height: 30px;
+    }
+    .error {
+      color: red;
+      margin: 10px 0;
+      display: none;
+    }
+    .success {
+      color: green;
+      margin: 10px 0;
+      display: none;
+    }
+    #ton-connect {
+      margin: 20px auto;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .bet-amounts {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+      margin: 15px 0;
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .bet-btn {
+      padding: 10px 12px;
+      font-size: 16px;
+      font-weight: bold;
+      background-color: #e8e8e8;
+      color: #333;
+      border: 2px solid #ccc;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .bet-btn:hover {
+      background-color: #d5d5d5;
+      border-color: #999;
+    }
+    .bet-btn.selected {
+      background-color: #4CAF50;
+      color: white;
+      border-color: #45a049;
+    }
+    @media (max-width: 600px) {
+      .bet-amounts {
+        grid-template-columns: repeat(3, 1fr);
+      }
+      .bet-btn.full-width-mobile {
+        grid-column: span 3;
+      }
+    }
+    .deposit-controls {
+      margin: 20px 0;
+      padding: 15px;
+      background-color: #f9f9f9;
+      border-radius: 8px;
+    }
+    .bet-controls {
+      margin: 20px 0;
+      padding: 15px;
+      background-color: #f0f8ff;
+      border-radius: 8px;
+    }
+    .withdraw-btn {
+      background-color: #ff9800;
+      margin-left: 10px;
+    }
+    .withdraw-btn:hover {
+      background-color: #e68900;
+    }
+    .section-title {
+      font-weight: bold;
+      margin-bottom: 10px;
+      color: #333;
+    }
+</style>
 </head>
 <body>
-    <div class="container">
-        <h1>TON Coin Flip Game</h1>
+  <div class="container">
+    <h1>TON Coin Flip Game</h1>
+    <div id="balance">Your in-game balance: 0.00 TON</div>
+    <div id="ton-connect"></div>
+    <div class="error" id="error-message"></div>
+    <div class="success" id="success-message"></div>
 
-        <div id="balance">Your in-game balance: 0.00 TON</div>
-
-        <div id="ton-connect"></div>
-
-        <div class="error" id="error-message"></div>
-        <div class="success" id="success-message"></div>
-
-        <div class="deposit-controls">
-            <div class="section-title">💰 Deposit TON</div>
-            <input type="number" id="depositAmount" min="1" max="1000" step="0.1" value="10" placeholder="Deposit amount (1-1000 TON)">
-            <button onclick="deposit()">Deposit TON</button>
-            <button class="withdraw-btn" onclick="withdraw()">Withdraw</button>
-        </div>
-
-        <div class="bet-controls">
-            <div class="section-title">🎯 Select Bet Amount</div>
-            <div class="bet-amounts">
-                <button class="bet-btn selected" onclick="selectBetAmount(0.5)">0.5</button>
-                <button class="bet-btn" onclick="selectBetAmount(1)">1</button>
-                <button class="bet-btn" onclick="selectBetAmount(2)">2</button>
-                <button class="bet-btn" onclick="selectBetAmount(5)">5</button>
-                <button class="bet-btn" onclick="selectBetAmount(10)">10</button>
-                <button class="bet-btn" onclick="selectBetAmount(20)">20</button>
-                <button class="bet-btn" onclick="selectBetAmount(50)">50</button>
-                <button class="bet-btn" onclick="selectBetAmount(100)">100</button>
-                <button class="bet-btn" onclick="selectBetAmount(500)">500</button>
-                <button class="bet-btn full-width-mobile" onclick="selectBetAmount(1000)">1000</button>
-            </div>
-            <div>Selected bet: <span id="selectedBet">0.5</span> TON</div>
-        </div>
-
-        <div id="coin">
-            <span class="coin-text">💎</span>
-        </div>
-
-        <div class="controls">
-            <button onclick="flip('heads')" id="headsBtn">Heads</button>
-            <button onclick="flip('tails')" id="tailsBtn">Tails</button>
-        </div>
-
-        <div id="result"></div>
+    <div id="coin">
+      <span class="coin-text">💎</span>
+    </div>
+    <div class="controls">
+      <button onclick="flip('heads')" id="headsBtn">Heads</button>
+      <button onclick="flip('tails')" id="tailsBtn">Tails</button>
     </div>
 
-    <!-- Visa JavaScript logika (su tavo adresu) liks kaip buvo -->
-    <!-- Patikrinau, kad pinigai eina i tavo saskaita: UQAmyVyYj0GqYxYhINVXgzERiEe8Sa8c03mbV2Q8yYAMKvxg -->
+    <div class="bet-controls">
+      <div class="section-title">🎯 Select Bet Amount</div>
+      <div class="bet-amounts">
+        <button class="bet-btn selected" onclick="selectBetAmount(0.5)">0.5</button>
+        <button class="bet-btn" onclick="selectBetAmount(1)">1</button>
+        <button class="bet-btn" onclick="selectBetAmount(2)">2</button>
+        <button class="bet-btn" onclick="selectBetAmount(5)">5</button>
+        <button class="bet-btn" onclick="selectBetAmount(10)">10</button>
+        <button class="bet-btn" onclick="selectBetAmount(20)">20</button>
+        <button class="bet-btn" onclick="selectBetAmount(50)">50</button>
+        <button class="bet-btn" onclick="selectBetAmount(100)">100</button>
+        <button class="bet-btn" onclick="selectBetAmount(500)">500</button>
+        <button class="bet-btn full-width-mobile" onclick="selectBetAmount(1000)">1000</button>
+      </div>
+      <div>Selected bet: <span id="selectedBet">0.5</span> TON</div>
+    </div>
+
+    <div id="result"></div>
+
+    <div class="deposit-controls">
+      <div class="section-title">💰 Deposit TON</div>
+      <input type="number" id="depositAmount" min="1" max="1000" step="0.1" value="10" placeholder="Deposit amount (1-1000 TON)">
+      <button onclick="deposit()">Deposit TON</button>
+      <button class="withdraw-btn" onclick="withdraw()">Withdraw</button>
+    </div>
+  </div>
+
+  <!-- Sound effects -->
+  <audio id="winSound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_6478241a99.mp3?filename=success-1-6297.mp3"></audio>
+  <audio id="loseSound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_d9ce97c839.mp3?filename=fail-1-89169.mp3"></audio>
+
+  <script>
+    const gameState = {
+      balance: 0,
+      selectedBetAmount: 0.5,
+      storageKey: 'tonCoinFlipBalance'
+    };
+
+    const winSound = document.getElementById("winSound");
+    const loseSound = document.getElementById("loseSound");
+
+    function saveBalance() {
+      localStorage.setItem(gameState.storageKey, gameState.balance.toString());
+    }
+
+    function loadBalance() {
+      const saved = localStorage.getItem(gameState.storageKey);
+      if (saved && !isNaN(saved)) {
+        gameState.balance = parseFloat(saved);
+      }
+    }
+
+    function updateBalanceDisplay() {
+      document.getElementById("balance").textContent = `Your in-game balance: ${gameState.balance.toFixed(2)} TON`;
+      saveBalance();
+    }
+
+    function selectBetAmount(amount) {
+      gameState.selectedBetAmount = amount;
+      document.querySelectorAll('.bet-btn').forEach(btn => btn.classList.remove('selected'));
+      event.target.classList.add('selected');
+      document.getElementById("selectedBet").textContent = amount;
+    }
+
+    function flip(userChoice) {
+      const amount = gameState.selectedBetAmount;
+      if (gameState.balance < amount) {
+        alert("Your balance is too low. Please deposit TON before playing.");
+        return;
+      }
+
+      const coin = document.getElementById("coin");
+      const coinText = coin.querySelector(".coin-text");
+      const resultEl = document.getElementById("result");
+
+      coin.style.animation = "flip 1s linear";
+      coinText.textContent = "?";
+      resultEl.textContent = "";
+
+      setTimeout(() => {
+        coin.style.animation = "none";
+        const outcome = Math.random() < 0.5 ? "heads" : "tails";
+        coinText.textContent = outcome === "heads" ? "💎" : "T";
+
+        if (userChoice === outcome) {
+          gameState.balance += amount;
+          resultEl.textContent = "🎉 You WON!";
+          winSound.play();
+        } else {
+          gameState.balance -= amount;
+          resultEl.textContent = "😢 You LOST!";
+          loseSound.play();
+        }
+
+        updateBalanceDisplay();
+      }, 1000);
+    }
+
+    function deposit() {
+      const input = document.getElementById("depositAmount");
+      const amount = parseFloat(input.value);
+      if (!isNaN(amount) && amount > 0) {
+        gameState.balance += amount;
+        updateBalanceDisplay();
+        alert(`Deposited ${amount} TON to your game balance.`);
+      }
+    }
+
+    function withdraw() {
+      if (gameState.balance <= 0) {
+        alert("No balance to withdraw.");
+        return;
+      }
+      alert(`Withdrawal of ${gameState.balance.toFixed(2)} TON requested. It will be processed manually.`);
+      gameState.balance = 0;
+      updateBalanceDisplay();
+    }
+
+    window.onload = () => {
+      loadBalance();
+      updateBalanceDisplay();
+    };
+  </script>
 </body>
 </html>
