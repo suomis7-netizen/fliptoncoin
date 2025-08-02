@@ -32,9 +32,9 @@
       100% { transform: rotateY(360deg); }
     }
     button.game-button {
-      margin: 1rem;
-      padding: 1rem 2rem;
-      font-size: 1.2rem;
+      margin: 0.5rem;
+      padding: 0.7rem 1.5rem;
+      font-size: 1.1rem;
       cursor: pointer;
       background: #007bff;
       color: white;
@@ -46,8 +46,8 @@
       background: #0056b3;
     }
     select {
-      font-size: 1.2rem;
       padding: 0.5rem;
+      font-size: 1rem;
       margin-bottom: 1rem;
     }
   </style>
@@ -58,9 +58,12 @@
   <!-- TonConnect prisijungimo mygtukas -->
   <div id="ton-connect"></div>
 
-  <!-- Pasirink statymo sumą -->
+  <!-- Monetos -->
+  <div class="coin" id="coin">?</div>
+
+  <!-- Statymo pasirinkimas -->
   <div>
-    <label for="betAmount">Choose bet amount:</label><br>
+    <label for="betAmount">Choose your bet:</label>
     <select id="betAmount">
       <option value="0.1">0.1 TON</option>
       <option value="1">1 TON</option>
@@ -73,9 +76,6 @@
     </select>
   </div>
 
-  <!-- Moneta -->
-  <div class="coin" id="coin">?</div>
-
   <!-- Spėjimo mygtukai -->
   <div>
     <button class="game-button" onclick="flip('heads')">Heads</button>
@@ -85,30 +85,31 @@
   <p id="result"></p>
 
   <script>
+    const contractAddress = "EQDX9mDOtrux4xqlzWIl5OjPECsv1OEHwCLp1Tm5okfb1qKQ"; // tavo smartcontract adresas
+
     // Inicializuojame TonConnect UI
     const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
       manifestUrl: "https://suomis7-netizen.github.io/fliptoncoin/tonconnect-manifest.json",
       buttonRootId: "ton-connect"
     });
 
-    // Monetos metimo funkcija su transakcija
     async function flip(userChoice) {
       try {
-        const amountTON = parseFloat(document.getElementById("betAmount").value);
-        const amountNanoTON = (amountTON * 1e9).toFixed(0);
+        const selectedAmount = document.getElementById('betAmount').value;
+        const nanotons = (parseFloat(selectedAmount) * 1e9).toString();
 
         const tx = {
           validUntil: Math.floor(Date.now() / 1000) + 360,
-          messages: [{
-            address: "EQDX9mDOtrux4xqlzWIl5OjPECsv1OEHwCLp1Tm5okfb1qKQ",  // tavo kontrakto adresas
-            amount: amountNanoTON,
-            payload: ""  // kol kas be papildomo duomens
-          }]
+          messages: [
+            {
+              address: contractAddress,
+              amount: nanotons
+            }
+          ]
         };
 
         await tonConnectUI.sendTransaction(tx);
 
-        // Animacija
         const coin = document.getElementById('coin');
         const result = document.getElementById('result');
         coin.style.animation = 'flip 1s linear';
@@ -117,10 +118,9 @@
           coin.style.animation = 'none';
           const outcome = Math.random() < 0.5 ? 'heads' : 'tails';
           coin.textContent = outcome === 'heads' ? 'H' : 'T';
-          result.textContent =
-            userChoice === outcome
-              ? `🎉 You guessed ${userChoice.toUpperCase()} and WON (visual only)`
-              : `😢 You guessed ${userChoice.toUpperCase()} and lost`;
+          result.textContent = userChoice === outcome
+            ? '🎉 You won (visual only)!'
+            : '😢 You lost (visual only).';
         }, 1000);
 
       } catch (e) {
