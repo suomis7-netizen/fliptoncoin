@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Flip TON Coin</title>
+    <link rel="icon" href="favicon.png" type="image/png">
+    <link rel="apple-touch-icon" href="favicon.png">
     <style>
         * {
             margin: 0;
@@ -554,9 +556,12 @@
                     if (this.telegramUser) {
                         console.log('Telegram user:', this.telegramUser);
                         
+                        // Atkurti išsaugotus duomenis
+                        this.loadUserData();
+                        
                         // Rodyti personalizuotą sveikinimą
                         const welcomeMessage = this.telegramUser.first_name ? 
-                            `Welcome, ${this.telegramUser.first_name}! 🎮` : 
+                            `Welcome back, ${this.telegramUser.first_name}! 🎮` : 
                             'Welcome to Flip TON Coin! 🎮';
                             
                         setTimeout(() => {
@@ -565,6 +570,50 @@
                             }
                         }, 1000);
                     }
+                }
+            }
+
+            loadUserData() {
+                if (!this.telegramUser) return;
+                
+                const userId = this.telegramUser.id.toString();
+                const savedData = localStorage.getItem(`flipton_user_${userId}`);
+                
+                if (savedData) {
+                    try {
+                        const userData = JSON.parse(savedData);
+                        this.balance = userData.balance || 0;
+                        this.totalDeposited = userData.totalDeposited || 0;
+                        this.totalWithdrawn = userData.totalWithdrawn || 0;
+                        this.gameHistory = userData.gameHistory || [];
+                        
+                        // Atnaujinti UI su atkurtais duomenimis
+                        this.elements.balance.textContent = this.balance.toFixed(2);
+                        
+                        console.log('User data loaded:', userData);
+                    } catch (error) {
+                        console.error('Error loading user data:', error);
+                    }
+                }
+            }
+
+            saveUserData() {
+                if (!this.telegramUser) return;
+                
+                const userId = this.telegramUser.id.toString();
+                const userData = {
+                    balance: this.balance,
+                    totalDeposited: this.totalDeposited,
+                    totalWithdrawn: this.totalWithdrawn,
+                    gameHistory: this.gameHistory,
+                    lastSaved: new Date().toISOString()
+                };
+                
+                try {
+                    localStorage.setItem(`flipton_user_${userId}`, JSON.stringify(userData));
+                    console.log('User data saved');
+                } catch (error) {
+                    console.error('Error saving user data:', error);
                 }
             }
 
@@ -686,6 +735,9 @@
                             txHash: result.boc.substring(0,16)
                         });
                         
+                        // Išsaugoti duomenis
+                        this.saveUserData();
+                        
                         const depositMessage = `💰 <b>NEW DEPOSIT</b>\n\n` +
                             `🪙 Amount: <b>${amount} TON</b>\n` +
                             `👤 ${this.getUserInfo()}\n` +
@@ -781,6 +833,9 @@
                         timestamp: new Date().toISOString(),
                         status: 'pending'
                     });
+                    
+                    // Išsaugoti duomenis
+                    this.saveUserData();
                     
                     this.elements.statusMessage.textContent = `✅ Withdraw request accepted: ${amount} TON (processing within 48h)`;
                     this.updateUI();
@@ -908,6 +963,9 @@
                     probability: this.getWinProbability(this.currentBet),
                     timestamp: new Date().toISOString()
                 });
+                
+                // Išsaugoti žaidimo duomenis
+                this.saveUserData();
                 
                 if (!won || this.currentBet >= 10) {
                     const gameIcon = won ? '🎉' : '😈';
