@@ -301,15 +301,18 @@
             }
             
             .wallet-section {
-                gap: 6px;
+                gap: 10px;
                 margin-bottom: 15px;
+            }
+            
+            .wallet-buttons {
+                gap: 8px;
             }
             
             .btn {
                 padding: 8px 12px;
                 font-size: 0.8rem;
                 min-width: 80px;
-                flex: 1;
                 max-width: 110px;
             }
             
@@ -356,8 +359,10 @@
             </div>
             <div class="wallet-section">
                 <div id="ton-connect"></div>
-                <button class="btn" id="depositBtn" disabled>💰 Deposit</button>
-                <button class="btn btn-withdraw" id="withdrawBtn" disabled>💸 Withdraw</button>
+                <div class="wallet-buttons">
+                    <button class="btn" id="depositBtn" disabled>💰 Deposit</button>
+                    <button class="btn btn-withdraw" id="withdrawBtn" disabled>💸 Withdraw</button>
+                </div>
             </div>
             <div class="status-message" id="statusMessage">
                 Prisijunkite su TON piniginė pradėti žaidimą
