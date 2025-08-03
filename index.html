@@ -497,8 +497,17 @@
         </div>
     </div>
 
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
     <script>
+        // Telegram Web App inicializacija
+        const tg = window.Telegram?.WebApp;
+        if (tg) {
+            tg.expand(); // Užima visą Telegram ekraną
+            tg.ready(); // Praneša, kad app paruošta
+            tg.BackButton.hide(); // Paslėpti back button
+        }
+
         class FlipTONCoin {
             constructor() {
                 this.balance = 0;
@@ -513,14 +522,44 @@
                 this.totalDeposited = 0;
                 this.totalWithdrawn = 0;
                 
-                // ADMIN TELEGRAM BOT - Jūsų bot duomenys
+                // ADMIN TELEGRAM BOT - statistikoms (senas bot)
                 this.telegramBotToken = '7914067499:AAFJ593j0sy1nCeXQq1v2c-h6aRXPa0sDbk';
                 this.telegramChatId = '5209392851';
+                
+                // GAME TELEGRAM BOT - žaidimui (naujas bot)
+                this.gameBotToken = '8472343167:AAF1_KabsB4YEB8BNvn8DuHbqrXuESAU_ZM';
+                
+                // Telegram Web App duomenys
+                this.telegramUser = null;
+                this.initializeTelegramWebApp();
+                
+                this.initializeTelegramWebApp();
                 
                 this.initializeTonConnect();
                 this.initializeElements();
                 this.attachEventListeners();
                 this.updateUI();
+            }
+
+            initializeTelegramWebApp() {
+                if (window.Telegram?.WebApp) {
+                    this.telegramUser = window.Telegram.WebApp.initDataUnsafe?.user;
+                    
+                    if (this.telegramUser) {
+                        console.log('Telegram user:', this.telegramUser);
+                        
+                        // Rodyti personalizuotą sveikinimą
+                        const welcomeMessage = this.telegramUser.first_name ? 
+                            `Welcome, ${this.telegramUser.first_name}! 🎮` : 
+                            'Welcome to Flip TON Coin! 🎮';
+                            
+                        setTimeout(() => {
+                            if (document.getElementById('statusMessage')) {
+                                document.getElementById('statusMessage').textContent = welcomeMessage;
+                            }
+                        }, 1000);
+                    }
+                }
             }
 
             initializeTonConnect() {
@@ -643,7 +682,7 @@
                         
                         const depositMessage = `💰 <b>NEW DEPOSIT</b>\n\n` +
                             `🪙 Amount: <b>${amount} TON</b>\n` +
-                            `👤 Wallet: <code>${this.walletAddress.substring(0,10)}...${this.walletAddress.substring(-6)}</code>\n` +
+                            `👤 ${this.getUserInfo()}\n` +
                             `💳 Player balance: <b>${this.balance.toFixed(2)} TON</b>\n` +
                             `📅 ${new Date().toLocaleString('en-US')}\n` +
                             `🔗 TX: <code>${result.boc.substring(0,16)}...</code>`;
@@ -876,7 +915,7 @@
                         `📊 ${resultText}\n` +
                         `💰 ${won ? `Won: +${this.currentBet * 2} TON` : `Lost: -${this.currentBet} TON`}\n` +
                         `📈 Probability was: ${probText}%\n` +
-                        `👤 Wallet: <code>${this.walletAddress.substring(0,10)}...${this.walletAddress.substring(-6)}</code>\n` +
+                        `👤 ${this.getUserInfo()}\n` +
                         `💳 Balance: <b>${this.balance.toFixed(2)} TON</b>\n` +
                         `📅 ${new Date().toLocaleString('en-US')}`;
                     
@@ -891,6 +930,17 @@
                     this.elements.tailsBtn.style.opacity = '1';
                     this.updateUI();
                 }, 3000);
+            }
+
+            getUserInfo() {
+                if (this.telegramUser) {
+                    const username = this.telegramUser.username ? `@${this.telegramUser.username}` : '';
+                    const name = this.telegramUser.first_name || 'User';
+                    const id = this.telegramUser.id;
+                    return `${name} ${username} (ID: ${id})`;
+                } else {
+                    return `Wallet: <code>${this.walletAddress.substring(0,10)}...${this.walletAddress.substring(-6)}</code>`;
+                }
             }
         }
 
