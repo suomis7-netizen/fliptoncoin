@@ -64,6 +64,23 @@
             margin-bottom: 20px;
         }
 
+        #ton-connect {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* TON Connect mygtuko stilizavimas */
+        #ton-connect button {
+            border-radius: 12px !important;
+            font-weight: bold !important;
+            transition: all 0.3s ease !important;
+        }
+
+        #ton-connect button:hover {
+            transform: translateY(-2px) !important;
+        }
+
         .btn {
             padding: 10px 16px;
             border: none;
@@ -225,25 +242,6 @@
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
         }
 
-        .flip-btn {
-            background: linear-gradient(45deg, #27ae60, #2ecc71);
-            color: white;
-            font-size: 1.3rem;
-            padding: 15px 40px;
-            margin: 20px 0;
-            box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3);
-        }
-
-        .flip-btn:hover {
-            box-shadow: 0 6px 20px rgba(46, 204, 113, 0.4);
-        }
-
-        .flip-btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-
         .result-message {
             margin: 20px 0;
             padding: 15px;
@@ -276,7 +274,37 @@
 
         @media (max-width: 600px) {
             .game-container {
-                padding: 20px;
+                padding: 15px;
+                margin: 10px;
+                max-width: calc(100% - 20px);
+            }
+            
+            .game-title {
+                font-size: 2.2rem;
+                margin-bottom: 15px;
+            }
+            
+            .balance-section {
+                padding: 15px;
+                margin: 15px 0;
+            }
+            
+            .balance-display {
+                font-size: 1.5rem;
+                margin-bottom: 12px;
+            }
+            
+            .wallet-section {
+                gap: 6px;
+                margin-bottom: 15px;
+            }
+            
+            .btn {
+                padding: 8px 12px;
+                font-size: 0.8rem;
+                min-width: 80px;
+                flex: 1;
+                max-width: 110px;
             }
             
             .bet-buttons {
@@ -286,12 +314,28 @@
             
             .bet-btn {
                 padding: 8px;
-                font-size: 0.9rem;
+                font-size: 0.8rem;
+                min-height: 40px;
             }
             
             .choice-buttons {
                 flex-direction: column;
                 align-items: center;
+                gap: 10px;
+            }
+            
+            .choice-btn {
+                width: 100%;
+                max-width: 200px;
+            }
+            
+            .coin {
+                width: 120px;
+                height: 120px;
+            }
+            
+            .coin-side {
+                font-size: 1.5rem;
             }
         }
     </style>
@@ -305,8 +349,7 @@
                 Balansas: <span id="balance">0.00</span> TON
             </div>
             <div class="wallet-section">
-                <button class="btn" id="connectBtn">🔗 Prisijungti</button>
-                <div id="ton-connect" style="display: none;"></div>
+                <div id="ton-connect"></div>
                 <button class="btn" id="depositBtn" disabled>💰 Deposit</button>
                 <button class="btn btn-withdraw" id="withdrawBtn" disabled>💸 Withdraw</button>
             </div>
@@ -380,8 +423,6 @@
                         if (walletInfo) {
                             this.walletAddress = walletInfo.account.address;
                             this.isConnected = true;
-                            this.elements.connectBtn.textContent = '✅ Prisijungta';
-                            this.elements.connectBtn.disabled = true;
                             this.elements.depositBtn.disabled = false;
                             this.elements.withdrawBtn.disabled = false;
                             this.elements.statusMessage.textContent = `Prisijungta: ${this.walletAddress.substring(0, 10)}...`;
@@ -389,8 +430,6 @@
                         } else {
                             this.isConnected = false;
                             this.walletAddress = null;
-                            this.elements.connectBtn.textContent = '🔗 Prisijungti';
-                            this.elements.connectBtn.disabled = false;
                             this.elements.depositBtn.disabled = true;
                             this.elements.withdrawBtn.disabled = true;
                             this.elements.statusMessage.textContent = 'Prisijunkite su TON piniginė pradėti žaidimą';
@@ -403,7 +442,6 @@
             initializeElements() {
                 this.elements = {
                     balance: document.getElementById('balance'),
-                    connectBtn: document.getElementById('connectBtn'),
                     depositBtn: document.getElementById('depositBtn'),
                     withdrawBtn: document.getElementById('withdrawBtn'),
                     statusMessage: document.getElementById('statusMessage'),
@@ -416,7 +454,6 @@
             }
 
             attachEventListeners() {
-                this.elements.connectBtn.addEventListener('click', () => this.connectWallet());
                 this.elements.depositBtn.addEventListener('click', () => this.showDepositModal());
                 this.elements.withdrawBtn.addEventListener('click', () => this.showWithdrawModal());
                 
@@ -426,16 +463,6 @@
                 
                 this.elements.headsBtn.addEventListener('click', () => this.selectChoiceAndFlip('heads'));
                 this.elements.tailsBtn.addEventListener('click', () => this.selectChoiceAndFlip('tails'));
-            }
-
-            async connectWallet() {
-                try {
-                    this.elements.statusMessage.textContent = 'Jungiamasi prie TON piniginės...';
-                    await this.tonConnectUI.connectWallet();
-                } catch (error) {
-                    console.error('Wallet connection error:', error);
-                    this.elements.statusMessage.textContent = 'Klaida prisijungiant prie piniginės';
-                }
             }
 
             showDepositModal() {
@@ -595,7 +622,8 @@
                 if (!this.canPlay()) return;
                 
                 this.isFlipping = true;
-                this.elements.flipBtn.disabled = true;
+                this.elements.headsBtn.disabled = true;
+                this.elements.tailsBtn.disabled = true;
                 this.elements.resultMessage.textContent = 'Moneta skrenda...';
                 
                 // Animuojame monetą
