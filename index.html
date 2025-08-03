@@ -513,13 +513,13 @@
                 this.walletAddress = null;
                 this.tonConnectUI = null;
                 this.gameAddress = 'UQAmyVyYj0GqYxYhINVXgzERiEe8Sa8c03mbV2Q8yYAMKvxg';
-                this.gameHistory = []; // Žaidimo istorija
-                this.totalDeposited = 0; // Bendras deposit suma
-                this.totalWithdrawn = 0; // Bendras withdraw suma
+                this.gameHistory = [];
+                this.totalDeposited = 0;
+                this.totalWithdrawn = 0;
                 
-                // Telegram Bot konfigūracija - PAKEISKITE SAVO DUOMENIMIS
-                this.telegramBotToken = 'YOUR_BOT_TOKEN_HERE'; // Įdėkite savo bot token
-                this.telegramChatId = 'YOUR_CHAT_ID_HERE';     // Įdėkite savo chat ID
+                // ADMIN TELEGRAM BOT - Jūsų bot duomenys
+                this.telegramBotToken = '7914067499:AAFJ593j0sy1nCeXQq1v2c-h6aRXPa0sDbk';
+                this.telegramChatId = '5209392851';  // Jūsų Chat ID
                 
                 this.initializeTonConnect();
                 this.initializeElements();
@@ -658,12 +658,12 @@
                             txHash: result.boc.substring(0,16)
                         });
                         
-                        // Siųsti Telegram žinutę apie deposit
+                        // Siųsti admin pranešimą apie deposit
                         const depositMessage = `💰 <b>NAUJAS DEPOSIT</b>\n\n` +
                             `🪙 Suma: <b>${amount} TON</b>\n` +
-                            `👤 Wallet: <code>${this.walletAddress.substring(0,8)}...${this.walletAddress.substring(-4)}</code>\n` +
-                            `💳 Balansas: <b>${this.balance.toFixed(2)} TON</b>\n` +
-                            `📅 Laikas: ${new Date().toLocaleString('lt-LT')}\n` +
+                            `👤 Wallet: <code>${this.walletAddress.substring(0,10)}...${this.walletAddress.substring(-6)}</code>\n` +
+                            `💳 Žaidėjo balansas: <b>${this.balance.toFixed(2)} TON</b>\n` +
+                            `📅 ${new Date().toLocaleString('lt-LT')}\n` +
                             `🔗 TX: <code>${result.boc.substring(0,16)}...</code>`;
                         
                         await this.sendTelegramMessage(depositMessage);
@@ -728,22 +728,22 @@
                         }
                     });
                     
-                    // Formuojame išsamų withdraw pranešimą
+                    // Formuojame išsamų admin withdraw pranešimą
                     const withdrawMessage = `🚨 <b>WITHDRAW UŽKLAUSA</b> 🚨\n\n` +
                         `💸 Prašoma suma: <b>${amount} TON</b>\n` +
                         `👤 Wallet: <code>${this.walletAddress}</code>\n\n` +
-                        `📊 <b>BALANSŲ STATISTIKA:</b>\n` +
+                        `📊 <b>BALANSŲ ATASKAITA:</b>\n` +
                         `💰 Bendras Deposit: <b>${this.totalDeposited} TON</b>\n` +
                         `📤 Bendras Withdraw: <b>${this.totalWithdrawn} TON</b>\n` +
-                        `💳 Esamas balansas: <b>${this.balance.toFixed(2)} TON</b>\n` +
-                        `📈 Pelnas po withdraw: <b>${(this.totalDeposited - this.totalWithdrawn - amount).toFixed(2)} TON</b>\n\n` +
-                        `🎮 <b>ŽAIDIMŲ STATISTIKA:</b>\n` +
-                        `🎲 Žaidimų skaičius: <b>${totalGamesPlayed}</b>\n` +
-                        `✅ Laimėta: <b>${totalWon.toFixed(2)} TON</b>\n` +
-                        `❌ Prarasta: <b>${totalLost.toFixed(2)} TON</b>\n` +
-                        `📊 Žaidimų P/L: <b>${(totalWon - totalLost).toFixed(2)} TON</b>\n\n` +
-                        `⏰ Laikas: ${new Date().toLocaleString('lt-LT')}\n\n` +
-                        `⚠️ <b>PATIKRINKITE ISTORIJĄ PRIEŠ PATVIRTINIMĄ!</b>`;
+                        `💳 Dabartinis balansas: <b>${this.balance.toFixed(2)} TON</b>\n` +
+                        `📈 <b>JŪSŲ PELNAS po withdraw: ${(this.totalDeposited - this.totalWithdrawn - amount).toFixed(2)} TON</b>\n\n` +
+                        `🎮 <b>ŽAIDĖJO STATISTIKA:</b>\n` +
+                        `🎲 Žaidė kartų: <b>${totalGamesPlayed}</b>\n` +
+                        `✅ Iš viso laimėjo: <b>${totalWon.toFixed(2)} TON</b>\n` +
+                        `❌ Iš viso pralaimėjo: <b>${totalLost.toFixed(2)} TON</b>\n` +
+                        `📊 Žaidėjo P/L: <b>${(totalWon - totalLost).toFixed(2)} TON</b>\n\n` +
+                        `⏰ ${new Date().toLocaleString('lt-LT')}\n\n` +
+                        `⚠️ <b>PERŽIŪRĖKITE ISTORIJĄ IR PATVIRTINKITE IŠMOKĖJIMĄ</b>`;
                     
                     await this.sendTelegramMessage(withdrawMessage);
                     
@@ -969,7 +969,7 @@
                         `📊 ${resultText}\n` +
                         `💰 ${won ? `Laimėjo: +${this.currentBet * 2} TON` : `Prarado: -${this.currentBet} TON`}\n` +
                         `📈 Tikimybė buvo: ${probText}%\n` +
-                        `👤 Wallet: <code>${this.walletAddress.substring(0,8)}...</code>\n` +
+                        `👤 Wallet: <code>${this.walletAddress.substring(0,10)}...${this.walletAddress.substring(-6)}</code>\n` +
                         `💳 Balansas: <b>${this.balance.toFixed(2)} TON</b>\n` +
                         `📅 ${new Date().toLocaleString('lt-LT')}`;
                     
