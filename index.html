@@ -58,22 +58,25 @@
 
         .wallet-section {
             display: flex;
-            gap: 10px;
+            flex-wrap: wrap;
+            gap: 8px;
             justify-content: center;
             margin-bottom: 20px;
         }
 
         .btn {
-            padding: 12px 24px;
+            padding: 10px 16px;
             border: none;
             border-radius: 12px;
-            font-size: 1rem;
+            font-size: 0.9rem;
             font-weight: bold;
             cursor: pointer;
             transition: all 0.3s ease;
             background: linear-gradient(45deg, #0088cc, #00b4d8);
             color: white;
             box-shadow: 0 4px 15px rgba(0, 136, 204, 0.3);
+            white-space: nowrap;
+            min-width: 90px;
         }
 
         .btn:hover {
@@ -151,8 +154,10 @@
         .bet-buttons {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: repeat(3, 1fr);
             gap: 10px;
             margin: 20px 0;
+            width: 100%;
         }
 
         .bet-btn {
@@ -164,6 +169,11 @@
             font-weight: bold;
             cursor: pointer;
             transition: all 0.3s ease;
+            font-size: 0.9rem;
+            min-height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .bet-btn:hover {
@@ -271,6 +281,12 @@
             
             .bet-buttons {
                 grid-template-columns: repeat(3, 1fr);
+                gap: 8px;
+            }
+            
+            .bet-btn {
+                padding: 8px;
+                font-size: 0.9rem;
             }
             
             .choice-buttons {
@@ -319,6 +335,8 @@
                 <button class="bet-btn" data-amount="100">100 TON</button>
                 <button class="bet-btn" data-amount="500">500 TON</button>
                 <button class="bet-btn" data-amount="1000">1000 TON</button>
+                <button class="bet-btn" data-amount="2000">2000 TON</button>
+                <button class="bet-btn" data-amount="5000">5000 TON</button>
             </div>
             
             <div class="choice-buttons">
@@ -393,7 +411,6 @@
                     betButtons: document.querySelectorAll('.bet-btn'),
                     headsBtn: document.getElementById('headsBtn'),
                     tailsBtn: document.getElementById('tailsBtn'),
-                    flipBtn: document.getElementById('flipBtn'),
                     resultMessage: document.getElementById('resultMessage')
                 };
             }
@@ -621,6 +638,9 @@
                 setTimeout(() => {
                     this.isFlipping = false;
                     this.elements.resultMessage.className = 'result-message';
+                    this.currentChoice = null; // Atnaujiname pasirinkimą
+                    this.elements.headsBtn.style.opacity = '1';
+                    this.elements.tailsBtn.style.opacity = '1';
                     this.updateUI();
                 }, 3000);
             }
